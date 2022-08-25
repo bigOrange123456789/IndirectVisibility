@@ -1,11 +1,20 @@
 import json
+import os
+from Tool import Tool as T
 class Loader:#主要作用是给出直接可见度
    def __init__(self,opt):
+    import time as t
+    t0=t.time()
     self.opt=opt
-    data,nameList0=self.loading()
-    d0_=self.direct(data)
-
-    self.result=[nameList0,d0_]
+    if os.path.exists(self.opt["out1"]):
+        d0_,nameList0=T.r2(self.opt["out1"])
+    else:
+        data,nameList0=self.loading()
+        d0_=self.direct(data)
+        T.w2(d0_,self.opt["out1"],nameList0)
+    print("step1.执行时间："+str(((t.time()-t0)/60))+" min")
+    self.result=[nameList0,d0_,t.time()-t0]
+    
    #1.直接可见度
    def loading(self):
       print("采样集:",self.opt["in"])

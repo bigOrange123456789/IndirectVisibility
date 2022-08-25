@@ -1,11 +1,23 @@
 import numpy as np
+import os
 from Tool import Tool as T
 from ToolG import ToolG as TG
 class ClusteringViewer:
   def __init__(self,d0_,nameList0,opt):
+    import time as t
+    t0=t.time()
     self.opt=opt
-    d0,nameList,redunList=self.clustering(d0_,nameList0,self.opt["step"])
-    self.result=[d0,nameList,redunList]#d0,nameList,redunList
+    if os.path.exists(self.opt["out2.d0"]) and os.path.exists(self.opt["out2.nameList"]) and os.path.exists(self.opt["out2"]):
+        d0=T.r(self.opt["out2.d0"])
+        nameList=T.r_txt(self.opt["out2.nameList"])
+        redunList=T.loadJson(self.opt["out2"])
+    else:
+        d0,nameList,redunList=self.clustering(d0_,nameList0,self.opt["step"])
+        T.w(d0,self.opt["out2.d0"])
+        T.w(nameList,self.opt["out2.nameList"])
+        T.saveJson(self.opt["out2"],redunList)
+    print("step2.执行时间："+str(((t.time()-t0)/60))+" min")
+    self.result=[d0,nameList,redunList,t.time()-t0]#d0,nameList,redunList
   def kMeans(self,dataSet, step):#dataSet中每一行是一个元素
     print("聚类步长：",step)
     import math as math
