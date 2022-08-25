@@ -5,10 +5,7 @@ class Loader:#主要作用是给出直接可见度
     data,nameList0=self.loading()
     d0_=self.direct(data)
 
-    self.result={
-        'nameList0':nameList0,
-        'd0_':d0_
-    }
+    self.result=[nameList0,d0_]
    #1.直接可见度
    def loading(self):
       print("采样集:",self.opt["in"])
