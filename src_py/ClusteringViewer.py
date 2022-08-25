@@ -1,9 +1,9 @@
 import numpy as np
 import os
 from Tool import Tool as T
-from ToolG import ToolG as TG
 class ClusteringViewer:
   def __init__(self,d0_,nameList0,opt):
+    
     import time as t
     t0=t.time()
     self.opt=opt
@@ -19,6 +19,7 @@ class ClusteringViewer:
     print("step2.执行时间："+str(((t.time()-t0)/60))+" min")
     self.result=[d0,nameList,redunList,t.time()-t0]#d0,nameList,redunList
   def kMeans(self,dataSet, step):#dataSet中每一行是一个元素
+    from ToolG import ToolG as TG
     print("聚类步长：",step)
     import math as math
     n = np.shape(dataSet)[1] #数据集的列数
@@ -65,6 +66,7 @@ class ClusteringViewer:
     print()
     return centroids.tolist(), clusterAssment.tolist()   # 返回：质心，每个元素的类别 
   def kMeans0(self,dataSet, step):#dataSet中每一行是一个元素
+    from ToolG import ToolG as TG
     print("聚类步长：",step)
     import math as math
     n = np.shape(dataSet)[1] #数据集的列数

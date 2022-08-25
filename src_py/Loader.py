@@ -1,8 +1,9 @@
 import json
 import os
-from Tool import Tool as T
+
 class Loader:#主要作用是给出直接可见度
    def __init__(self,opt):
+    from Tool import Tool as T
     import time as t
     t0=t.time()
     self.opt=opt

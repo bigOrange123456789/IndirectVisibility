@@ -1,8 +1,7 @@
-from Tool import Tool as T
-from ToolG import ToolG as TG
 import os
 class Lists:
   def __init__(self,opt,d0,d1,redunList,nameList):
+    from Tool import Tool as T
     import time as t
     t0=t.time()
     self.opt=opt
@@ -12,7 +11,7 @@ class Lists:
         else:
             ls=self.getLists_sim(d0)
             T.w2(ls,self.opt["out6"],nameList)
-        self.result=[ls,t.time()-t0]
+        nameList=[]
     else:
         if os.path.exists(self.opt["out6"]) and os.path.exists(self.opt["out6_i"]):
             ls,nameList=T.r2(self.opt["out6"])
@@ -22,7 +21,7 @@ class Lists:
             ls,ls1,ls2,nameList=self.addRedunList(ls,ls1,ls2,nameList,redunList)#ls,ls1,ls2,nameList
             T.w2(ls,self.opt["out6"],nameList)
             T.w2(ls2,self.opt["out6_i"],nameList)
-        self.result=[ls1,nameList,t.time()-t0]
+    self.result=[ls1,nameList,t.time()-t0]
     print("step6.执行时间："+str((t.time()-t0)/60)+" min")
   def getlist(self,arr1,arr2,maxL):#直接可见度，间接可见度，最大长度
     for i in range(len(arr1)):
@@ -88,6 +87,7 @@ class Lists:
         list_d.append(index)    
     return list_d
   def getLists_sim(self,d0):
+    from ToolG import ToolG as TG
     lists_d=[]#直接可见度资源列表
     if self.opt["useGPU"]:
         order0=TG.sort(d0)
@@ -100,6 +100,7 @@ class Lists:
         print("必须使用GPU")
     return lists_d
   def getLists(self,d0,d1):
+    from ToolG import ToolG as TG
     lists=[]
     lists_d=[]#直接可见度资源列表
     lists_i=[]#间接可见度资源列表

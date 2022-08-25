@@ -1,16 +1,13 @@
-import numpy as np
 import sys
-
-from src_py.ReduceError import ReduceError
 sys.path.append("src_py")
-from Tool import Tool as T
-from ToolG import ToolG as TG
-from Loader import Loader as Loader
-from ClusteringViewer import ClusteringViewer
-from NoiseReduction import NoiseReduction
+from Loader import Loader as Loader  #1.直接可见度
+from ClusteringViewer import ClusteringViewer  #2.去除冗余视点
+from NoiseReduction import NoiseReduction  #3.获取特征,通过特征矩阵进行降噪
 from SimMat import SimMat
 from Lists import Lists
-np.set_printoptions(precision=2)
+from Mul import Mul
+from ReduceError import ReduceError
+
 class IndirectVisibility:
   @staticmethod
   def mkdir(path):
@@ -40,19 +37,6 @@ class IndirectVisibility:
         }
       for i in opt:
           self.opt[i]=opt[i]
-
-  #1.直接可见度
-  #2.0 合并相似构件
-  #2.去除冗余视点
-  #3.通过特征矩阵进行降噪
-  #4.相关矩阵
-  #5.间接可见度
-  def mul(self,a,b):
-    a=np.array(a)
-    b=np.array(b)
-    return np.matmul(a, b)
-  #6.计算资源加载列表
-  #7.缩小误差
     
   def start(self,step):
     print("起始步骤：",step)
@@ -63,28 +47,16 @@ class IndirectVisibility:
     t0=t.time()
     print('1.直接可见度')#第一步必须要执行
     nameList0,d0_,t1=Loader(self.opt).result
-    print("2.去除冗余")
+    print("2.去除冗余视点")
     d0,nameList,redunList,t2=ClusteringViewer(d0_,nameList0,self.opt).result
-    print('3.获取特征')
+    print('3.获取特征,通过特征矩阵进行降噪')
     e,t3=NoiseReduction(self.opt,d0).result#进行降维去噪
     print('4.相关矩阵')
-    if not self.opt["sim"]:#不计算间接可见度时不需要相关矩阵
-     s,t4=SimMat(self.opt,e).result#SimMat().getSimMat(e)#self.getSimMat(e)#
+    s,t4=SimMat(self.opt,e).result#SimMat().getSimMat(e)#self.getSimMat(e)#
     print('5.间接可见度')
-    t5_=t.time()
-    if not self.opt["sim"]:#不计算间接可见度
-     if step>5:
-        d1=T.r(self.opt["out5"])
-     else:
-        d1=self.mul(d0,s)#一次间接可见度
-        T.w(d1,self.opt["out5"])
-    t5=t.time()
-    print("step5.执行时间："+str(((t5-t5_)/60))+" min")
+    d1,t5=Mul(self.opt,d0,s).result
     print('6.计算资源加载列表')
-    if self.opt["sim"]:
-        ls1,t6=Lists(self.opt,d0,d1,redunList,nameList).result
-    else:
-        ls1,nameList,t6=Lists(self.opt,d0,d1,redunList,nameList).result
+    ls1,nameList,t6=Lists(self.opt,d0,d1,redunList,nameList).result
     print('7.缩小误差')
     ReduceError(self.opt,d0_,nameList0,ls1,nameList).result#self.reduceError(d0_,nameList0,ls1,nameList)
 
