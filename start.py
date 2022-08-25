@@ -3,7 +3,7 @@ import sys
 sys.path.append("lib_py")
 from Tool import Tool as T
 from ToolG import ToolG as TG
-from Loading import Loading as Loading
+from Loader import Loader as Loader
 import json
 np.set_printoptions(precision=2)
 class IndirectVisibility:
@@ -37,50 +37,6 @@ class IndirectVisibility:
           self.opt[i]=opt[i]
 
   #1.直接可见度
-  def loading(self):
-      print("采样集:",self.opt["in"])
-      data=[]
-      nameList=[]
-      import os
-      numberAll=len(os.listdir(self.opt["in"]))
-      numberIndex=0
-      for fileName in os.listdir(self.opt["in"]):
-          if fileName=="config.json" or not len(fileName.split(".json"))==2:
-              continue
-          f1=open(self.opt["in"]+"/"+fileName, encoding='gb18030', errors='ignore')
-          j=json.load(f1)
-          if self.opt["multidirectionalSampling"]:#分成多个方向分别存储
-            j_all={}
-            for direct in j:
-                for componet_id in j[direct]:
-                    j_all[componet_id]=j[direct][componet_id]
-            j=j_all
-          data.append(j)
-          nameList.append(fileName.split(".json")[0])
-          numberIndex=numberIndex+1
-          print(str(numberIndex)+"/"+str(numberAll),end="\r")
-      print()
-      return data,nameList
-  def getMax(self,data):#获取构件的最大编号 既构件编号
-    max=-1
-    for i in data:
-        for j in i:
-            j=int(j)
-            if j>max:
-                max=j
-    return max+1
-  def direct(self,data):#获得直接可见度
-    number=self.getMax(data)+1#构件个数 
-    data2=[]
-    for i in range(len(data)):#每一行是一个视点
-        data2.append([])
-        for j in range(number):
-            data2[i].append(0)
-        for j in data[i]:
-            data2[i][int(j)]=data[i][j]
-    print("视点个数:",len(data2))
-    print("构件个数:",number)
-    return data2#每一列是一个特征
   #2.0 合并相似构件
   
   #2.去除冗余视点
@@ -430,12 +386,12 @@ class IndirectVisibility:
     if step>1:
         d0_,nameList0=T.r2(self.opt["out1"])
     else:
-        data,nameList0=self.loading()#Loading.loading(self.opt)#
-        d0_=self.direct(data)#degree
+        loader=Loader(self.opt)
+        nameList0=loader.result['nameList0']
+        d0_=loader.result['d0_']
         T.w2(d0_,self.opt["out1"],nameList0)
     t1=t.time()
     print("step1.执行时间："+str(((t1-t0)/60))+" min")
-    # exit(0)
     
     print("2.去除冗余")
     if step>2:#跳过第2步
@@ -513,11 +469,11 @@ class IndirectVisibility:
     print("总执行时间："+str(((tl-t0)/60))+" min")
 if __name__ == "__main__":#用于测试
     print('version:2022.02.16-01')
-    iv=IndirectVisibility({"in":"in/test"})
+    iv=IndirectVisibility({"in":"in/test_viewerPoint"})
     #iv=IndirectVisibility({"in":"in/KaiLiNan02"})
     #iv=IndirectVisibility({"in":"in.HaiNing.22.02.14/all"})
     #iv=IndirectVisibility({"in":"in.KaiLiNan22.01.16-1"})
     # iv=IndirectVisibility({"in":"1.move_all"})
     iv.opt["sim"]=False#True#
-    iv.opt["step"]=1
+    iv.opt["step"]=2
     iv.start(1)

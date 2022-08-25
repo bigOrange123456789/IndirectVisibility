@@ -1,8 +1,14 @@
 import json
-class Loading:
+class Loader:#主要作用是给出直接可见度
    def __init__(self,opt):
     self.opt=opt
-    print()
+    data,nameList0=self.loading()
+    d0_=self.direct(data)
+
+    self.result={
+        'nameList0':nameList0,
+        'd0_':d0_
+    }
    #1.直接可见度
    def loading(self):
       print("采样集:",self.opt["in"])
@@ -28,5 +34,25 @@ class Loading:
           print(str(numberIndex)+"/"+str(numberAll),end="\r")
       print()
       return data,nameList
+   def getMax(self,data):#获取构件的最大编号 既构件编号
+    max=-1
+    for i in data:
+        for j in i:
+            j=int(j)
+            if j>max:
+                max=j
+    return max+1
+   def direct(self,data):#获得直接可见度
+    number=self.getMax(data)+1#构件个数 
+    data2=[]
+    for i in range(len(data)):#每一行是一个视点
+        data2.append([])
+        for j in range(number):
+            data2[i].append(0)
+        for j in data[i]:
+            data2[i][int(j)]=data[i][j]
+    print("视点个数:",len(data2))
+    print("构件个数:",number)
+    return data2#每一列是一个特征
 if __name__ == "__main__":#用于测试
     print()
