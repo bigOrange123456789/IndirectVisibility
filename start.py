@@ -5,6 +5,7 @@ from Tool import Tool as T
 from ToolG import ToolG as TG
 from Loader import Loader as Loader
 from ClusteringViewer import ClusteringViewer
+from NoiseReduction import NoiseReduction
 np.set_printoptions(precision=2)
 class IndirectVisibility:
   @staticmethod
@@ -39,26 +40,7 @@ class IndirectVisibility:
   #1.直接可见度
   #2.0 合并相似构件
   #2.去除冗余视点
-  #3.特征矩阵
-  def eigenMat(self,data2):#获得特征矩阵
-    #data2=np.array(data2).T
-    U,Sigma,VT=np.linalg.svd(data2)
-    Sigma_sum=np.sum(Sigma)
-
-    for i in range(len(Sigma)):
-        if np.sum(Sigma[0:i+1])>=1.*Sigma_sum:
-            break
-    dim=i+1
-
-    s=np.mat(np.eye(dim)*Sigma[:dim])
-    sI=np.linalg.inv(s)
-
-    temp=np.matmul(U[:,0:dim],sI)
-    temp=np.matmul(np.array(data2).T,temp)
-    temp=temp.T
-
-    return temp.tolist()
-    #return data2#每一列是一个特征
+  #3.通过特征矩阵进行降噪
   #4.相关矩阵
   def sim(self,inA,inB):#相关程度 （注：inA,inB的1范式为定值）
     inA=np.array(inA).T
@@ -269,8 +251,8 @@ class IndirectVisibility:
     
     print('3.获取特征')
     e=d0#不进行降维去噪
-    #e=self.eigenMat(d0)#进行降维去噪
-    #T.w(e,self.opt["out3"])
+    e=NoiseReduction.eigenMat(d0)#进行降维去噪
+    T.w(e,self.opt["out3"])
     t3=t.time()
     print("step3.执行时间："+str(((t3-t2)/60))+" min")
     
