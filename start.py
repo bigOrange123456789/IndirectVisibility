@@ -1,6 +1,6 @@
 import sys
 sys.path.append("src_py")
-from Loader import Loader as Loader  #1.直接可见度
+from Loader import Loader  #1.直接可见度
 from ClusteringViewer import ClusteringViewer  #2.去除冗余视点
 from NoiseReduction import NoiseReduction  #3.获取特征,通过特征矩阵进行降噪
 from SimMat import SimMat
@@ -34,12 +34,13 @@ class IndirectVisibility:
         "out7_d":"./out/7.ls_d",
         "areaMin":64,#构件的投影面积小于这个数值视为不可见
         "multidirectionalSampling":False,#True,#不同方向的采样结果分开存储
+        'startNow':False,#是否在对象初始化阶段执行start()方法
         }
       for i in opt:
           self.opt[i]=opt[i]
-    
-  def start(self,step):
-    print("起始步骤：",step)
+      if self.opt['startNow']==True:
+        self.start()
+  def start(self):
     print("opt")
     for i in self.opt:
         print("  "+i+":",self.opt[i])
@@ -56,7 +57,7 @@ class IndirectVisibility:
     print('5.间接可见度')
     d1,t5=Mul(self.opt,d0,s).result
     print('6.计算资源加载列表')
-    ls1,nameList,t6=Lists(self.opt,d0,d1,redunList,nameList).result
+    ls,ls1,ls2,nameList,t6=Lists(self.opt,d0,d1,redunList,nameList).result
     print('7.缩小误差')
     ReduceError(self.opt,d0_,nameList0,ls1,nameList).result#self.reduceError(d0_,nameList0,ls1,nameList)
 
@@ -69,13 +70,18 @@ class IndirectVisibility:
     print("step5.执行时间："+str((t5/60/1000))+" min")
     print("step6.执行时间："+str((t6/60/1000))+" min")
     print("总执行时间："+str(((tl-t0)/60))+" min")
+
+    #以下部分用于测试中的断言
+    self.ls={}
+    for i in range(len(nameList)):
+      self.ls[nameList[i]]=ls[i]
 if __name__ == "__main__":#用于测试
     print('version:2022.02.16-01')
-    iv=IndirectVisibility({"in":"in/test_viewerPoint"})
+    iv=IndirectVisibility({"in":"in/test"})
     #iv=IndirectVisibility({"in":"in/KaiLiNan02"})
     #iv=IndirectVisibility({"in":"in.HaiNing.22.02.14/all"})
     #iv=IndirectVisibility({"in":"in.KaiLiNan22.01.16-1"})
     # iv=IndirectVisibility({"in":"1.move_all"})
     iv.opt["sim"]=False#True#
-    iv.opt["step"]=2
-    iv.start(1)
+    iv.opt["step"]=1
+    iv.start()

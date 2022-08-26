@@ -21,7 +21,7 @@ class Lists:
             ls,ls1,ls2,nameList=self.addRedunList(ls,ls1,ls2,nameList,redunList)#ls,ls1,ls2,nameList
             T.w2(ls,self.opt["out6"],nameList)
             T.w2(ls2,self.opt["out6_i"],nameList)
-    self.result=[ls1,nameList,t.time()-t0]
+    self.result=[ls,ls1,ls2,nameList,t.time()-t0]
     print("step6.执行时间："+str((t.time()-t0)/60)+" min")
   def getlist(self,arr1,arr2,maxL):#直接可见度，间接可见度，最大长度
     for i in range(len(arr1)):
