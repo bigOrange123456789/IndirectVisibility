@@ -1,7 +1,9 @@
 import sys
+
 sys.path.append("src_py")
 from Loader import Loader  #1.直接可见度
 from ClusteringViewer import ClusteringViewer  #2.去除冗余视点
+from ClusteringComponent import ClusteringComponent
 from NoiseReduction import NoiseReduction  #3.获取特征,通过特征矩阵进行降噪
 from SimMat import SimMat
 from Lists import Lists
@@ -21,8 +23,10 @@ class IndirectVisibility:
         "out1":"./out/1.direct",#直接可见度矩阵，txt
         "out2":"./out/2.redunList.json",#冗余视点列表
         "out2.d0":"./out/2.d0",
+        "out2.groups_arr":"./out/2.groups_arr",
         "out2.nameList":"./out/2.nameList",
         "step":2,#聚类个数的步长
+        "step_component":1,#构件聚类个数的步长
         "useGPU":True,#是否使用GPU
         "out3":"./out/3.e",#特征矩阵，txt
         "out4":"./out/4.simMat",#视觉相关度矩阵，txt
@@ -48,7 +52,8 @@ class IndirectVisibility:
     t0=t.time()
     print('1.直接可见度')#第一步必须要执行
     nameList0,d0_,t1=Loader(self.opt).result
-    print("2.去除冗余视点")
+    print("2.去除冗余")
+    d0_,groups_arr=ClusteringComponent(d0_,self.opt).result
     d0,nameList,redunList,t2=ClusteringViewer(d0_,nameList0,self.opt).result
     print('3.获取特征,通过特征矩阵进行降噪')
     e,t3=NoiseReduction(self.opt,d0).result#进行降维去噪
@@ -77,11 +82,13 @@ class IndirectVisibility:
       self.ls[nameList[i]]=ls[i]
 if __name__ == "__main__":#用于测试
     print('version:2022.02.16-01')
-    iv=IndirectVisibility({"in":"in/test"})
+    # iv=IndirectVisibility({"in":"in/test"})
+    iv=IndirectVisibility({"in":"in/test_component2"})
     #iv=IndirectVisibility({"in":"in/KaiLiNan02"})
     #iv=IndirectVisibility({"in":"in.HaiNing.22.02.14/all"})
     #iv=IndirectVisibility({"in":"in.KaiLiNan22.01.16-1"})
     # iv=IndirectVisibility({"in":"1.move_all"})
     iv.opt["sim"]=False#True#
     iv.opt["step"]=1
+    iv.opt["step_component"]=2
     iv.start()

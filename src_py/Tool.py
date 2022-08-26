@@ -150,3 +150,9 @@ class Tool:
         import json
         with open(path, 'w') as write_f:
             write_f.write(json.dumps(data, indent=4, ensure_ascii=False))
+#    @staticmethod
+#    def saveJson(path,data):
+#         json.dump(
+#             data,
+#             open(path,"w")
+#         )

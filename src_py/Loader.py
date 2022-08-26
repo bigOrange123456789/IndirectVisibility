@@ -1,6 +1,5 @@
 import json
 import os
-
 class Loader:#主要作用是给出直接可见度
    def __init__(self,opt):
     from Tool import Tool as T
@@ -15,7 +14,6 @@ class Loader:#主要作用是给出直接可见度
         T.w2(d0_,self.opt["out1"],nameList0)
     print("step1.执行时间："+str(((t.time()-t0)/60))+" min")
     self.result=[nameList0,d0_,t.time()-t0]
-    
    #1.直接可见度
    def loading(self):
       print("采样集:",self.opt["in"])
@@ -50,7 +48,7 @@ class Loader:#主要作用是给出直接可见度
                 max=j
     return max+1
    def direct(self,data):#获得直接可见度
-    number=self.getMax(data)+1#构件个数 
+    number=self.getMax(data)#构件的最大编号
     data2=[]
     for i in range(len(data)):#每一行是一个视点
         data2.append([])

@@ -1,0 +1,47 @@
+import numpy as np
+import os
+from Tool import Tool as T
+from lib.Clustering import Clustering
+class ClusteringComponent:
+  def __init__(self,d0_,opt):
+    self.opt=opt
+    d0,groups_arr=self.clustering(
+        d0_,
+        self.opt["step_component"])
+    # T.saveJson(opt["out2.groups_arr"]+".json",groups_arr)
+    self.result=[d0,groups_arr]#d0,nameList,redunList
+
+  def clustering(self,dataSet,step):
+    if step==1:#如果步长为1就不进行冗余去除
+        return dataSet,[]
+    dataSet=np.array(dataSet).T.tolist()
+    centroids, clustAssing = Clustering(self.opt).kMeans(dataSet,step)#聚类#centroids:质心位置, clustAssing:每个元素对应的质心及到质心的距离
+    dataSet=np.array(centroids).T.tolist()
+    groups_arr=self.get_groups_arr(clustAssing)
+    # print("clustAssing\n",np.array(clustAssing))
+    # print("groups\n",groups_arr)
+    return dataSet, groups_arr
+  def get_groups_arr(self,clustAssing):
+    groups_arr=[]
+    groupId_max=-1
+    for i in range(len(clustAssing)):
+        groupId=int(clustAssing[i][0])
+        if groupId_max<groupId:
+            groupId_max=groupId
+    for i in range(groupId_max+1):
+        groups_arr.append([])
+    for i in range(len(clustAssing)):
+        groupId=int(clustAssing[i][0])
+        groups_arr[groupId].append(i)
+    return groups_arr
+  def get_groups(self,clustAssing):
+    groups={}
+    for i in range(len(clustAssing)):
+        groupId=int(clustAssing[i][0])
+        groups[groupId]=[]
+    for i in range(len(clustAssing)):
+        groupId=int(clustAssing[i][0])
+        groups[groupId].append(i)
+    return groups
+if __name__ == "__main__":#用于测试
+    print()
