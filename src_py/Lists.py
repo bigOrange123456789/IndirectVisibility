@@ -1,7 +1,7 @@
 import os
+from Tool import Tool as T
 class Lists:
   def __init__(self,opt,d0,d1,redunList,nameList):
-    from Tool import Tool as T
     import time as t
     t0=t.time()
     self.opt=opt

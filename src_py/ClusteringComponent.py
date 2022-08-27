@@ -15,8 +15,19 @@ class ClusteringComponent:
     if step==1:#如果步长为1就不进行冗余去除
         return dataSet,[]
     dataSet=np.array(dataSet).T.tolist()
-    centroids, clustAssing = Clustering(self.opt).kMeans(dataSet,step)#聚类#centroids:质心位置, clustAssing:每个元素对应的质心及到质心的距离
-    dataSet=np.array(centroids).T.tolist()
+    if self.opt["groups_outEachStep"]:
+      clustering=Clustering(self.opt)
+      centroids, clustAssing, clusterChanged =clustering.kMeans_one(dataSet,step)
+      while clusterChanged:
+        centroids, clustAssing, clusterChanged =clustering.kMeans_next()
+      dataSet=centroids.T.tolist()
+      clustAssing=clustAssing.tolist()
+    else:
+      centroids, clustAssing = Clustering(self.opt).kMeans(dataSet,step)#聚类#centroids:质心位置, clustAssing:每个元素对应的质心及到质心的距离
+      dataSet=np.array(centroids).T.tolist()
+
+
+    
     groups_arr=self.get_groups_arr(clustAssing)
     # print("clustAssing\n",np.array(clustAssing))
     # print("groups\n",groups_arr)

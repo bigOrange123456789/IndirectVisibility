@@ -1,5 +1,5 @@
 import sys
-
+#conda install numba
 sys.path.append("src_py")
 from Loader import Loader  #1.直接可见度
 from ClusteringViewer import ClusteringViewer  #2.去除冗余视点
@@ -24,6 +24,7 @@ class IndirectVisibility:
         "out2":"./out/2.redunList.json",#冗余视点列表
         "out2.d0":"./out/2.d0",
         "out2.groups_arr":"./out/2.groups_arr",
+        "groups_outEachStep":False,#是否输出距离过程中每一次迭代的结果
         "out2.nameList":"./out/2.nameList",
         "step":2,#聚类个数的步长
         "step_component":1,#构件聚类个数的步长
@@ -83,12 +84,14 @@ class IndirectVisibility:
 if __name__ == "__main__":#用于测试
     print('version:2022.02.16-01')
     # iv=IndirectVisibility({"in":"in/test"})
-    iv=IndirectVisibility({"in":"in/test_component2"})
+    iv=IndirectVisibility({"in":"in/test_component"})
     #iv=IndirectVisibility({"in":"in/KaiLiNan02"})
     #iv=IndirectVisibility({"in":"in.HaiNing.22.02.14/all"})
     #iv=IndirectVisibility({"in":"in.KaiLiNan22.01.16-1"})
     # iv=IndirectVisibility({"in":"1.move_all"})
     iv.opt["sim"]=False#True#
     iv.opt["step"]=1
+    iv.opt["useGPU"]=False
     iv.opt["step_component"]=2
+    iv.opt["groups_outEachStep"]=True
     iv.start()
