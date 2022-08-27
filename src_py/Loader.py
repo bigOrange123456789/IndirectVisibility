@@ -6,7 +6,7 @@ class Loader:#主要作用是给出直接可见度
     import time as t
     t0=t.time()
     self.opt=opt
-    if os.path.exists(self.opt["out1"]):
+    if os.path.exists(self.opt["out1"]+".json"):
         d0_,nameList0=T.r2(self.opt["out1"])
     else:
         data,nameList0=self.loading()

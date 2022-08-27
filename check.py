@@ -10,7 +10,22 @@ def del_file(path_data):#删除文件夹下面的所有文件(只删除文件,�
 class Judgment:
     def __init__(self):
         self.flagNumber=1
+    def remove(self,dir_path):
+        if not os.path.exists(dir_path):
+            return
+        if os.path.isfile(dir_path):
+            try:
+                os.remove(dir_path) # 这个可以删除单个文件，不能删除文件夹
+            except BaseException as e:
+                print(e)
+        elif os.path.isdir(dir_path):
+            file_lis = os.listdir(dir_path)
+            for file_name in file_lis:
+                # if file_name != 'wibot.log':
+                tf = os.path.join(dir_path, file_name)
+                self.remove(tf)
     def judgment(self,tag,config,result):
+        self.remove("out")
         print(str(self.flagNumber)+":开始"+tag)
         self.assert0(
             IndirectVisibility(config).ls,

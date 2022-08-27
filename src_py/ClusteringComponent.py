@@ -22,7 +22,6 @@ class ClusteringComponent:
       while clusterChanged:
         centroids, clustAssing, clusterChanged =clustering.kMeans_next()
         group_index=group_index+1
-        # print("clustAssing",clustAssing)
         groups_arr=self.get_groups_arr(clustAssing.tolist())
         T.saveJson(self.opt["out2.groups_arr"]+str(group_index)+".json",groups_arr)
       dataSet=centroids.T.tolist()
@@ -33,9 +32,6 @@ class ClusteringComponent:
 
       groups_arr=self.get_groups_arr(clustAssing)
       T.saveJson(self.opt["out2.groups_arr"]+".json",groups_arr)
-
-    # print("clustAssing\n",np.array(clustAssing))
-    # print("groups\n",groups_arr)
     return dataSet, groups_arr
   def get_groups_arr(self,clustAssing):
     groups_arr=[]
