@@ -18,17 +18,22 @@ class ClusteringComponent:
     if self.opt["groups_outEachStep"]:
       clustering=Clustering(self.opt)
       centroids, clustAssing, clusterChanged =clustering.kMeans_one(dataSet,step)
+      group_index=0
       while clusterChanged:
         centroids, clustAssing, clusterChanged =clustering.kMeans_next()
+        group_index=group_index+1
+        # print("clustAssing",clustAssing)
+        groups_arr=self.get_groups_arr(clustAssing.tolist())
+        T.saveJson(self.opt["out2.groups_arr"]+str(group_index)+".json",groups_arr)
       dataSet=centroids.T.tolist()
       clustAssing=clustAssing.tolist()
     else:
       centroids, clustAssing = Clustering(self.opt).kMeans(dataSet,step)#聚类#centroids:质心位置, clustAssing:每个元素对应的质心及到质心的距离
       dataSet=np.array(centroids).T.tolist()
 
+      groups_arr=self.get_groups_arr(clustAssing)
+      T.saveJson(self.opt["out2.groups_arr"]+".json",groups_arr)
 
-    
-    groups_arr=self.get_groups_arr(clustAssing)
     # print("clustAssing\n",np.array(clustAssing))
     # print("groups\n",groups_arr)
     return dataSet, groups_arr

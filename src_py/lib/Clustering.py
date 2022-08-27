@@ -63,43 +63,15 @@ class Clustering:#目前使用欧式距离
     dataSet=np.mat(dataSet)
     m = np.shape(dataSet)[0] #数据集的行数(个数)
     clusterAssment = np.mat(np.zeros((m, 2)))# m*2的零矩阵 用来记录每个点最近的中心和距离
-    clusterChanged = True
-    timer=0#记录迭代次数
-    if True:#只执行一次 #while clusterChanged:#直到聚类结果不变时再停止
-        clusterChanged = False
-        if self.opt["useGPU"]:
-            distTG=TG.getDist(centroids,dataSet)#每个行向量到每个中心的距离
-        for i in range(m): #寻找每个元素最近的质心  #遍历每个元素
-            print("1:"+str(i)+"/"+str(m),end="\r")
-            minDist = 0
-            minIndex = -1
-            for j in range(k):#遍历所有质心
-                if self.opt["useGPU"]:
-                    distJI = distTG[j][i]
-                else:
-                    distJI = np.sum(np.power(centroids[j, :]- dataSet[i, :], 2))#计算元素到质心的距离平方 #比较大小不需要开根号
-                if minIndex==-1 or distJI < minDist:
-                    minDist = distJI
-                    minIndex = j#质心编号
-            if clusterAssment[i, 0] != minIndex:
-                clusterChanged = True
-            clusterAssment[i, :] = minIndex, minDist # 每个元素：【质心编号，到质心的距离】
-        nullNumber=0#记录空集个数
-        for cent in range(k):   #更新质心的位置   #遍历所有质心
-            print("2:"+str(cent+1)+"/"+str(k),end="\r")
-            ptsInClust = dataSet[np.nonzero(clusterAssment[:, 0].A == cent)[0]]
-            if not len(ptsInClust)==0:#该质心对应的点不为空
-                centroids[cent, :] = np.mean(ptsInClust, axis=0)
-            else:
-                nullNumber=nullNumber+1
-        self.timer=1#timer+1
-        self.m=m#定值 表示元素个数
-        self.k=k#定值 表示质心个数
-        self.dataSet=dataSet
-        print("\t\t\t\t空集比例:"+str(nullNumber)+"/"+str(k)+"\t迭代次数："+str(timer))
+    
+    self.timer=0#timer+1
+    self.m=m#定值 表示元素个数
+    self.k=k#定值 表示质心个数
+    self.dataSet=dataSet
+
     self.centroids=centroids#保存质心 用于下一次迭代
     self.clusterAssment=clusterAssment#保存分组信息 用于下一次迭代
-    return centroids,clusterAssment,clusterChanged#质心 类别 是否结束    #return centroids.tolist(), clusterAssment.tolist()   # 返回：质心，每个元素的类别 
+    return centroids,clusterAssment,True#质心 类别 是否继续迭代    #return centroids.tolist(), clusterAssment.tolist()   # 返回：质心，每个元素的类别 
   def kMeans_next(self):#dataSet中每一行是一个元素#只进行一次迭代
     centroids=self.centroids#读取上一次迭代的结果
     clusterAssment=self.clusterAssment#读取上一次迭代的结果
