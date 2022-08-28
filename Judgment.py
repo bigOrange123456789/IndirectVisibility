@@ -96,43 +96,27 @@ if __name__ == "__main__":#用于测试
             "3,1,0":"1,0,1",
             "3,1,1":"1,0,1"
         })
-    jud.judgment(
-        "检验构件分组",
-        {
-            "in":"in/test_component2",
-            "sim":False,
-            "step":1,
-            "step_component":2,
-            "startNow":True
-        },
-        {
-            "0,0,0":[0,1,2],
-            "0,0,1":[2,1,0,3],
-            "0,1,0":[3,2,1],
-            "0,1,1":[4],
-            "1,0,0":[5],
-            "1,0,1":[],
-            "1,1,0":[],
-            "1,1,1":[]
-        })
-    jud.judgment(
-        "检验构件分组(非GPU)",
-        {
-            "in":"in/test_component2",
-            "sim":False,
-            "step":1,
-            "step_component":2,
-            "startNow":True,
-            "useGPU":False,
-        },
-        {
-            "0,0,0":[0,1,2],
-            "0,0,1":[2,1,0,3],
-            "0,1,0":[3,2,1],
-            "0,1,1":[4],
-            "1,0,0":[5],
-            "1,0,1":[],
-            "1,1,0":[],
-            "1,1,1":[]
-        })
+    for useGPU in ["GPU","noGPU"]:
+        for groups_outEachStep in ["输出中间结果","不输出中间结果"]:
+            jud.judgment(
+                "检验构件分组("+useGPU+","+groups_outEachStep+")",
+                {
+                    "in":"in/test_component2",
+                    "sim":False,
+                    "step":1,
+                    "step_component":2,
+                    "startNow":True,
+                    "useGPU":useGPU=="GPU",
+                    "groups_outEachStep":groups_outEachStep=="输出中间结果",
+                },
+                {
+                    "0,0,0":[0,1,2],
+                    "0,0,1":[2,1,0,3],
+                    "0,1,0":[3,2,1],
+                    "0,1,1":[4],
+                    "1,0,0":[5],
+                    "1,0,1":[],
+                    "1,1,0":[],
+                    "1,1,1":[]
+                })
     

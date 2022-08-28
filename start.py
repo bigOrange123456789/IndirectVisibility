@@ -1,5 +1,5 @@
+import time as t
 import sys
-#conda install numba
 sys.path.append("src_py")
 from Check import Check
 from Loader import Loader  #1.直接可见度
@@ -46,18 +46,7 @@ class IndirectVisibility:
           self.opt[i]=opt[i]
       if self.opt['startNow']==True:
         self.start()
-  def start(self):
-    print("opt")
-    for i in self.opt:
-        print("  "+i+":",self.opt[i])
-    Check(self.opt)
-    import time as t
-    t0=t.time()
-    print('1.直接可见度')#第一步必须要执行
-    nameList0,d0_,t1=Loader(self.opt).result
-    print("2.去除冗余")
-    d0_,groups_arr=ClusteringComponent(d0_,self.opt).result
-    d0,nameList,redunList,t2=ClusteringViewer(d0_,nameList0,self.opt).result
+  def process(self,d0,d0_,nameList0,nameList,redunList):
     print('3.获取特征,通过特征矩阵进行降噪')
     e,t3=NoiseReduction(self.opt,d0).result#进行降维去噪
     print('4.相关矩阵')
@@ -69,28 +58,54 @@ class IndirectVisibility:
     print('7.缩小误差')
     ReduceError(self.opt,d0_,nameList0,ls1,nameList).result#self.reduceError(d0_,nameList0,ls1,nameList)
 
-    print("finish!")
-    tl=t.time()
-    print("step1.执行时间："+str((t1/60/1000))+" min")
-    print("step2.执行时间："+str((t2/60/1000))+" min")
     print("step3.执行时间："+str((t3/60/1000))+" min")
     print("step4.执行时间："+str((t4/60/1000))+" min")
     print("step5.执行时间："+str((t5/60/1000))+" min")
     print("step6.执行时间："+str((t6/60/1000))+" min")
-    print("总执行时间："+str(((tl-t0)/60))+" min")
 
-    #以下部分用于测试中的断言
+    return ls
+
+  def start(self):
+    t0=t.time()
+    print("opt")
+    for i in self.opt:
+        print("  "+i+":",self.opt[i])
+    Check(self.opt)
+    print('1.直接可见度')#第一步必须要执行
+    nameList0,d0_,t1=Loader(self.opt).result
+    print("2.去除冗余")
+    d0_,groups_arr=ClusteringComponent(d0_,self.opt).result
+    d0,nameList,redunList,t2=ClusteringViewer(d0_,nameList0,self.opt).result
+    
+    if self.opt["multidirectionalSampling"]:
+      ls=self.process(d0,d0_,nameList0,nameList,redunList)
+    else:
+      ls=self.process(d0,d0_,nameList0,nameList,redunList)
+
+    print("finish!")
+    tl=t.time()
+    print("step1.执行时间："+str((t1/60/1000))+" min")
+    print("step2.执行时间："+str((t2/60/1000))+" min")
+    print("总执行时间："+str(((tl-t0)/60))+" min")
+    #以下代码用于测试中的断言
     self.ls={}
     for i in range(len(nameList)):
       self.ls[nameList[i]]=ls[i]
 if __name__ == "__main__":#用于测试
-    print('version:2022.02.16-01')
+    print('version:2022.08.28-1')
+    # iv=IndirectVisibility({"in":"in/test"})
+    iv=IndirectVisibility({"in":"in/test_component2_multidirection"})
+    iv.opt["sim"]=False#True#
+    iv.opt["step"]=1
+    iv.opt["useGPU"]=False
+    iv.opt["step_component"]=2
+    iv.opt["groups_outEachStep"]=True
+    iv.opt["multidirectionalSampling"]=True
+    iv.start()
+if False:#用于测试
+    print('version:2022.08.28-1')
     # iv=IndirectVisibility({"in":"in/test"})
     iv=IndirectVisibility({"in":"in/test_component"})
-    #iv=IndirectVisibility({"in":"in/KaiLiNan02"})
-    #iv=IndirectVisibility({"in":"in.HaiNing.22.02.14/all"})
-    #iv=IndirectVisibility({"in":"in.KaiLiNan22.01.16-1"})
-    # iv=IndirectVisibility({"in":"1.move_all"})
     iv.opt["sim"]=False#True#
     iv.opt["step"]=1
     iv.opt["useGPU"]=False

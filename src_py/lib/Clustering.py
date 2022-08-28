@@ -6,6 +6,8 @@ class Clustering:#目前使用欧式距离
   def __init__(self,opt):
     self.opt=opt
   def kMeans(self,dataSet, step):#dataSet中每一行是一个元素
+    if not self.opt["useGPU"]:#不用GPU的话kMeans2性能更高一些
+        return self.kMeans2(dataSet, step)
     print("聚类步长：",step)
     import math as math
     n = np.shape(dataSet)[1] #数据集的列数
@@ -48,9 +50,19 @@ class Clustering:#目前使用欧式距离
             else:
                 nullNumber=nullNumber+1
         timer=timer+1
-        print("\t\t\t\t空集比例:"+str(nullNumber)+"/"+str(k)+"\t迭代次数："+str(timer))
+        print("\t\t\t\t空集比例:"+str(nullNumber)+"/"+str(k)+"\t迭代次数:"+str(timer))
     print()
     return centroids.tolist(), clusterAssment.tolist()   # 返回：质心，每个元素的类别 
+  def kMeans2(self,dataSet, step):
+    data=np.array(dataSet)
+    k= int(np.shape(dataSet)[0]/step)#质心个数
+    centers = data[ (np.array(range(k))*step).tolist(),:]             #np.mat(np.zeros((k, n)))#用于存储所有质心
+    for i in range(500): # 首先利用广播机制计算每个样本到簇中心的距离，之后根据最小距离重新归类
+        classifications = np.argmin(((data[:, :, None] - centers.T[None, :, :])**2).sum(axis=1), axis=1)#计算每个元素最近的质心
+        new_centers = np.array([data[classifications == j, :].mean(axis=0) for j in range(k)])# 对每个新的簇计算簇中心
+        if (new_centers == centers).all():break# 簇中心不再移动的话，结束循环
+        else: centers = new_centers
+    return  centers.tolist(), classifications[:, None].tolist()#return  centers.tolist(), classifications.tolist()
   def kMeans_one(self,dataSet, step):#dataSet中每一行是一个元素#只进行一次迭代
     print("聚类步长：",step)
     import math as math
