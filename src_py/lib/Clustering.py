@@ -1,6 +1,7 @@
 import numpy as np
 from Tool import Tool as T
 from ToolG import ToolG as TG
+import time as t
 class Clustering:#目前使用欧式距离
   def __init__(self,opt):
     self.opt=opt
@@ -73,6 +74,7 @@ class Clustering:#目前使用欧式距离
     self.clusterAssment=clusterAssment#保存分组信息 用于下一次迭代
     return centroids,clusterAssment,True#质心 类别 是否继续迭代    #return centroids.tolist(), clusterAssment.tolist()   # 返回：质心，每个元素的类别 
   def kMeans_next(self):#dataSet中每一行是一个元素#只进行一次迭代
+    t0=t.time()
     centroids=self.centroids#读取上一次迭代的结果
     clusterAssment=self.clusterAssment#读取上一次迭代的结果
     m = self.m#数据集的行数(个数)
@@ -107,7 +109,7 @@ class Clustering:#目前使用欧式距离
             else:
                 nullNumber=nullNumber+1
         self.timer=self.timer+1
-        print("\t\t\t\t空集比例:"+str(nullNumber)+"/"+str(k)+"\t迭代次数："+str(self.timer))
+        print("空集比例:"+str(nullNumber)+"/"+str(k)+"\t迭代次数:"+str(self.timer),"\t迭代计算耗时:"+str((t.time()-t0)/60/1000),"min\t\t")
     print()
     return centroids,clusterAssment,clusterChanged#质心 类别 是否结束    #return centroids.tolist(), clusterAssment.tolist()   # 返回：质心，每个元素的类别 
   def getRedundancy(self,clustAssing,k,tagList):#每个元素的类别，质心个数

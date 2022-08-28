@@ -1,6 +1,7 @@
 import sys
 #conda install numba
 sys.path.append("src_py")
+from Check import Check
 from Loader import Loader  #1.直接可见度
 from ClusteringViewer import ClusteringViewer  #2.去除冗余视点
 from ClusteringComponent import ClusteringComponent
@@ -49,6 +50,7 @@ class IndirectVisibility:
     print("opt")
     for i in self.opt:
         print("  "+i+":",self.opt[i])
+    Check(self.opt)
     import time as t
     t0=t.time()
     print('1.直接可见度')#第一步必须要执行

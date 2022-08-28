@@ -46,14 +46,6 @@ class ClusteringComponent:
         groupId=int(clustAssing[i][0])
         groups_arr[groupId].append(i)
     return groups_arr
-  def get_groups(self,clustAssing):
-    groups={}
-    for i in range(len(clustAssing)):
-        groupId=int(clustAssing[i][0])
-        groups[groupId]=[]
-    for i in range(len(clustAssing)):
-        groupId=int(clustAssing[i][0])
-        groups[groupId].append(i)
-    return groups
+
 if __name__ == "__main__":#用于测试
     print()
