@@ -64,6 +64,8 @@ class Clustering:#目前使用欧式距离
         else: centers = new_centers
     return  centers.tolist(), classifications[:, None].tolist()#return  centers.tolist(), classifications.tolist()
   def kMeans_one(self,dataSet, step):#dataSet中每一行是一个元素#只进行一次迭代
+    if not self.opt["useGPU"]:#不用GPU的话kMeans_next2性能更高一些
+        return self.kMeans_one2(dataSet, step)
     print("聚类步长：",step)
     import math as math
     n = np.shape(dataSet)[1] #数据集的列数
@@ -86,6 +88,8 @@ class Clustering:#目前使用欧式距离
     self.clusterAssment=clusterAssment#保存分组信息 用于下一次迭代
     return centroids,clusterAssment,True#质心 类别 是否继续迭代    #return centroids.tolist(), clusterAssment.tolist()   # 返回：质心，每个元素的类别 
   def kMeans_next(self):#dataSet中每一行是一个元素#只进行一次迭代
+    if not self.opt["useGPU"]:#不用GPU的话kMeans_next2性能更高一些
+        return self.kMeans_next2()
     t0=t.time()
     centroids=self.centroids#读取上一次迭代的结果
     clusterAssment=self.clusterAssment#读取上一次迭代的结果
@@ -124,6 +128,20 @@ class Clustering:#目前使用欧式距离
         print("空集比例:"+str(nullNumber)+"/"+str(k)+"\t迭代次数:"+str(self.timer),"\t迭代计算耗时:"+str((t.time()-t0)/60/1000),"min\t\t")
     print()
     return centroids,clusterAssment,clusterChanged#质心 类别 是否结束    #return centroids.tolist(), clusterAssment.tolist()   # 返回：质心，每个元素的类别 
+  def kMeans_one2(self,dataSet, step):
+    self.dataSet=np.array(dataSet)
+    self.k= int(np.shape(dataSet)[0]/step)#质心个数
+    self.centroids = self.dataSet[ (np.array(range(self.k))*step).tolist(),:]             #np.mat(np.zeros((k, n)))#用于存储所有质心
+    return  self.centroids, [],True#return  centers.tolist(), classifications.tolist()
+  def kMeans_next2(self):#dataSet中每一行是一个元素#只进行一次迭代
+    data=self.dataSet
+    centers=self.centroids
+    k=self.k    
+    classifications = np.argmin(((data[:, :, None] - centers.T[None, :, :])**2).sum(axis=1), axis=1)#计算每个元素最近的质心
+    new_centers = np.array([data[classifications == j, :].mean(axis=0) for j in range(k)])# 对每个新的簇计算簇中心
+    clusterChanged=not (new_centers == centers).all()#是否进行下一次迭代 
+    self.centroids=new_centers
+    return new_centers,classifications[:, None],clusterChanged#质心 类别 是否进行下一次迭代    #return centroids.tolist(), clusterAssment.tolist()   # 返回：质心，每个元素的类别 
   def getRedundancy(self,clustAssing,k,tagList):#每个元素的类别，质心个数
     result=[]
     for i in range(len(clustAssing)):
