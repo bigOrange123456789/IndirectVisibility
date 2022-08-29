@@ -39,7 +39,7 @@ class IndirectVisibility:
         "out6_i":"./"+out+"/6.ls_i",#资源加载列表，txt.json
         "out7_d":"./"+out+"/7.ls_d",
         "areaMin":64,#构件的投影面积小于这个数值视为不可见
-        "multidirectionalSampling":True,#False,#True,#不同方向的采样结果分开存储
+        "multidirectionalSampling":False,#True,#False,#True,#不同方向的采样结果分开存储
         'startNow':False,#是否在对象初始化阶段执行start()方法
         }
     for i in self.opt0:
@@ -54,19 +54,22 @@ class IndirectVisibility:
     d0,nameList,redunList,t2=ClusteringViewer(d0_,nameList0,self.opt).result
     print('3.获取特征,通过特征矩阵进行降噪')
     e,t3=NoiseReduction(self.opt,d0).result#进行降维去噪
-    print('4.相关矩阵')
-    s,t4=SimMat(self.opt,e).result#SimMat().getSimMat(e)#self.getSimMat(e)#
-    print('5.间接可见度')
-    d1,t5=Mul(self.opt,d0,s).result
+    if self.opt["sim"]:#简化版只计算直接可见度，不计算间接可见度
+      d1=[]#简化版中后面不会用到间接可见度
+    else:
+      print('4.相关矩阵')
+      s,t4=SimMat(self.opt,e).result#SimMat().getSimMat(e)#self.getSimMat(e)#
+      print('5.间接可见度')
+      d1,t5=Mul(self.opt,d0,s).result
+      
     print('6.计算资源加载列表')
     ls,ls1,ls2,nameList,t6=Lists(self.opt,d0,d1,redunList,nameList).result
     print('7.缩小误差')
-    ReduceError(self.opt,d0_,nameList0,ls1,nameList).result#self.reduceError(d0_,nameList0,ls1,nameList)
+    ls1,t7=ReduceError(self.opt,d0_,nameList0,ls1,nameList).result#self.reduceError(d0_,nameList0,ls1,nameList)
     print("step2.执行时间："+str((t2/60/1000))+" min")
     print("step3.执行时间："+str((t3/60/1000))+" min")
-    print("step4.执行时间："+str((t4/60/1000))+" min")
-    print("step5.执行时间："+str((t5/60/1000))+" min")
     print("step6.执行时间："+str((t6/60/1000))+" min")
+    self.nameList=nameList
     return ls
   def start(self):
     t0=t.time()
@@ -77,15 +80,9 @@ class IndirectVisibility:
     print('1.直接可见度')#第一步必须要执行
     loader=Loader(self.opt)
     nameList0,d0_,t1=loader.result
-    # import numpy as np
-    # print(
-    #   "nameList0\n",np.array(nameList0),"\n\n",
-    #   "d0_\n",np.array(d0_),"\n\n",
-    #   "dataSplit\n",np.array(loader.dataSplit),"\n")
-    # exit(0)
     print("2.去除冗余(构件)")
     d0_,groups_arr=ClusteringComponent(d0_,self.opt).result
-    
+    #如果是多方向采样下面的计算过程中不需要d0_ #print(groups_arr)
     if self.opt["multidirectionalSampling"]:
       for direct in loader.dataSplit:
         data0=loader.dataSplit[direct]#某个方向上的数据
@@ -100,17 +97,31 @@ class IndirectVisibility:
     print("总执行时间："+str(((tl-t0)/60))+" min")
     #以下代码用于测试中的断言
     self.ls={}
+    print(ls)
+    print(self.nameList)
+    for i in range(len(self.nameList)):
+      self.ls[self.nameList[i]]=ls[i]
 if __name__ == "__main__":#用于测试
     print('version:2022.08.28-1')
     # iv=IndirectVisibility({"in":"in/test"})
-    iv=IndirectVisibility({"in":"in/test_component2_multidirection"})
+    iv=IndirectVisibility({"in":"in/test_sort"})
     iv.opt["sim"]=False#True#
     iv.opt["step"]=1
     iv.opt["useGPU"]=False
-    iv.opt["step_component"]=2
+    iv.opt["step_component"]=1
     iv.opt["groups_outEachStep"]=True
-    iv.opt["multidirectionalSampling"]=True
     iv.start()
+# if __name__ == "__main__":#用于测试
+#     print('version:2022.08.28-1')
+#     # iv=IndirectVisibility({"in":"in/test"})
+#     iv=IndirectVisibility({"in":"in/test_component2_multidirection"})
+#     iv.opt["sim"]=False#True#
+#     iv.opt["step"]=1
+#     iv.opt["useGPU"]=False
+#     iv.opt["step_component"]=2
+#     iv.opt["groups_outEachStep"]=True
+#     iv.opt["multidirectionalSampling"]=True
+#     iv.start()
 if False:#用于测试
     print('version:2022.08.28-1')
     # iv=IndirectVisibility({"in":"in/test"})

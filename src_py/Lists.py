@@ -1,17 +1,19 @@
 import os
 from Tool import Tool as T
+import numpy as np
 class Lists:
   def __init__(self,opt,d0,d1,redunList,nameList):
     import time as t
     t0=t.time()
     self.opt=opt
-    if self.opt["sim"]:
+    if self.opt["sim"]:#不计算间接可见度
         if os.path.exists(self.opt["out6"]):
             ls,nameList=T.r2(self.opt["out6"])
         else:
             ls=self.getLists_sim(d0)
             T.w2(ls,self.opt["out6"],nameList)
-        nameList=[]
+        ls1=ls
+        ls2=[]
     else:
         if os.path.exists(self.opt["out6"]) and os.path.exists(self.opt["out6_i"]):
             ls,nameList=T.r2(self.opt["out6"])
@@ -97,7 +99,20 @@ class Lists:
             print("\t\t",str(round(100*(i+1)/len(d0),2))+"%","\t",str(i+1)+"/"+str(len(d0)),end="\r")
         print()
     else:#不使用GPU
-        print("必须使用GPU")
+        def sort(arr):
+            keys=[]
+            values=[]
+            for index in range(len(arr)):
+                if arr[index]>0:
+                    keys.append(index)
+                    values.append(arr[index])
+            if len(keys)==0:
+                return []
+            index2=np.argsort(-np.array(values))
+            return np.array(keys)[index2].tolist()
+        for i in range(len(d0)):#对每一行进行排序
+            list_d=sort(d0[i])
+            lists_d.append(list_d)
     return lists_d
   def getLists(self,d0,d1):
     from ToolG import ToolG as TG

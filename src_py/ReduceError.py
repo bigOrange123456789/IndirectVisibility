@@ -5,7 +5,9 @@ class ReduceError:
     t0=t.time()
     self.opt=opt
     from Tool import Tool as T
-    if os.path.exists(self.opt["out1"]):
+    if opt["step"]==1:#如果没有进行视点合并就不进行误差纠正
+        ls1_new=ls1
+    elif os.path.exists(self.opt["out1"]):
         ls1_new,nameList=T.r2(self.opt["out7_d"])
     else:
         ls1_new=self.reduceError(d0_,nameList0,ls1,nameList)
