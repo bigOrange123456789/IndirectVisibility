@@ -17,9 +17,9 @@ class IndirectVisibility:
     import os
     if not os.path.exists(path):
         os.makedirs(path) 
-  def setOpt(self):
-      out=self.outPath
-      self.opt={
+  def optSet(self,out):
+    self.mkdir(out)
+    self.opt={
         "in":"./in/test.json",
         "out1":"./"+out+"/1.direct",#直接可见度矩阵，txt
         "out2":"./"+out+"/2.redunList.json",#冗余视点列表
@@ -39,19 +39,19 @@ class IndirectVisibility:
         "out6_i":"./"+out+"/6.ls_i",#资源加载列表，txt.json
         "out7_d":"./"+out+"/7.ls_d",
         "areaMin":64,#构件的投影面积小于这个数值视为不可见
-        "multidirectionalSampling":False,#True,#不同方向的采样结果分开存储
+        "multidirectionalSampling":True,#False,#True,#不同方向的采样结果分开存储
         'startNow':False,#是否在对象初始化阶段执行start()方法
         }
-      for i in self.opt0:
-          self.opt[i]=self.opt0[i]
-  def __init__(self,opt0):
-      self.mkdir("out")
-      self.opt0=opt0
-      self.outPath="out"
-      self.setOpt()
+    for i in self.opt0:
+      self.opt[i]=self.opt0[i]
+  def __init__(self,opt):
+      self.opt0=opt
+      self.optSet("out")
       if self.opt['startNow']==True:
         self.start()
-  def process(self,d0,d0_,nameList0,nameList,redunList):
+  def process(self,d0_,nameList0):
+    print("2.去除冗余(视点)")
+    d0,nameList,redunList,t2=ClusteringViewer(d0_,nameList0,self.opt).result
     print('3.获取特征,通过特征矩阵进行降噪')
     e,t3=NoiseReduction(self.opt,d0).result#进行降维去噪
     print('4.相关矩阵')
@@ -62,6 +62,7 @@ class IndirectVisibility:
     ls,ls1,ls2,nameList,t6=Lists(self.opt,d0,d1,redunList,nameList).result
     print('7.缩小误差')
     ReduceError(self.opt,d0_,nameList0,ls1,nameList).result#self.reduceError(d0_,nameList0,ls1,nameList)
+    print("step2.执行时间："+str((t2/60/1000))+" min")
     print("step3.执行时间："+str((t3/60/1000))+" min")
     print("step4.执行时间："+str((t4/60/1000))+" min")
     print("step5.执行时间："+str((t5/60/1000))+" min")
@@ -74,25 +75,31 @@ class IndirectVisibility:
         print("  "+i+":",self.opt[i])
     Check(self.opt)
     print('1.直接可见度')#第一步必须要执行
-    nameList0,d0_,t1=Loader(self.opt).result
-    print("2.去除冗余")
+    loader=Loader(self.opt)
+    nameList0,d0_,t1=loader.result
+    # import numpy as np
+    # print(
+    #   "nameList0\n",np.array(nameList0),"\n\n",
+    #   "d0_\n",np.array(d0_),"\n\n",
+    #   "dataSplit\n",np.array(loader.dataSplit),"\n")
+    # exit(0)
+    print("2.去除冗余(构件)")
     d0_,groups_arr=ClusteringComponent(d0_,self.opt).result
-    d0,nameList,redunList,t2=ClusteringViewer(d0_,nameList0,self.opt).result
     
     if self.opt["multidirectionalSampling"]:
-      ls=self.process(d0,d0_,nameList0,nameList,redunList)
+      for direct in loader.dataSplit:
+        data0=loader.dataSplit[direct]#某个方向上的数据
+        d0_=loader.directSplit(data0,groups_arr)#每个方向单独计算直接可见度
+        self.optSet("out"+direct)
+        ls=self.process(d0_,nameList0)
     else:
-      ls=self.process(d0,d0_,nameList0,nameList,redunList)
-
+      ls=self.process(d0_,nameList0)
     print("finish!")
     tl=t.time()
     print("step1.执行时间："+str((t1/60/1000))+" min")
-    print("step2.执行时间："+str((t2/60/1000))+" min")
     print("总执行时间："+str(((tl-t0)/60))+" min")
     #以下代码用于测试中的断言
     self.ls={}
-    for i in range(len(nameList)):
-      self.ls[nameList[i]]=ls[i]
 if __name__ == "__main__":#用于测试
     print('version:2022.08.28-1')
     # iv=IndirectVisibility({"in":"in/test"})
