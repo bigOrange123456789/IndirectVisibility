@@ -81,7 +81,10 @@ class IndirectVisibility:
     loader=Loader(self.opt)
     nameList0,d0_,t1=loader.result
     print("2.去除冗余(构件)")
-    d0_,groups_arr=ClusteringComponent(d0_,self.opt).result
+    # d0_,groups_arr=ClusteringComponent(d0_,self.opt).result
+    from Tool import Tool
+    groups_arr=Tool.loadJson("groups_arr.json")
+    print(groups_arr)
     #如果是多方向采样下面的计算过程中不需要d0_ #print(groups_arr)
     if self.opt["multidirectionalSampling"]:
       for direct in loader.dataSplit:
@@ -102,32 +105,12 @@ class IndirectVisibility:
       self.ls[self.nameList[i]]=ls[i]
 if __name__ == "__main__":#用于测试
     print('version:2022.08.28-1')
-    # iv=IndirectVisibility({"in":"in/test"})
-    iv=IndirectVisibility({"in":"in/test_sort"})
-    iv.opt["sim"]=False#True#
+    iv=IndirectVisibility({"in":"1.move_all"})
+    iv.opt["sim"]=True
     iv.opt["step"]=1
     iv.opt["useGPU"]=False
-    iv.opt["step_component"]=1
+    iv.opt["step_component"]=50
     iv.opt["groups_outEachStep"]=True
+    iv.opt["multidirectionalSampling"]=True
     iv.start()
-# if __name__ == "__main__":#用于测试
-#     print('version:2022.08.28-1')
-#     # iv=IndirectVisibility({"in":"in/test"})
-#     iv=IndirectVisibility({"in":"in/test_component2_multidirection"})
-#     iv.opt["sim"]=False#True#
-#     iv.opt["step"]=1
-#     iv.opt["useGPU"]=False
-#     iv.opt["step_component"]=2
-#     iv.opt["groups_outEachStep"]=True
-#     iv.opt["multidirectionalSampling"]=True
-#     iv.start()
-if False:#用于测试
-    print('version:2022.08.28-1')
-    # iv=IndirectVisibility({"in":"in/test"})
-    iv=IndirectVisibility({"in":"in/test_component"})
-    iv.opt["sim"]=False#True#
-    iv.opt["step"]=1
-    iv.opt["useGPU"]=False
-    iv.opt["step_component"]=2
-    iv.opt["groups_outEachStep"]=True
-    iv.start()
+
