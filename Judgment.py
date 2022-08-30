@@ -141,4 +141,20 @@ if __name__ == "__main__":#用于测试
                     "1,1,0":[],
                     "1,1,1":[]
                 })
+    for useGPU in ["GPU","noGPU"]:
+        for sim in ["计算间接可见度","不算间接可见度"]:
+            jud.judgment(
+                "以8个视点的中心为新的视点("+useGPU+","+sim+")",
+                {
+                    "in":"in/test_sort",
+                    "sim":sim=="计算间接可见度",
+                    "step":1,
+                    "step_component":1,
+                    "startNow":True,
+                    "useGPU":useGPU=="GPU",
+                    "CentralVisibility":True
+                },
+                {
+                    "0.5,0.5,0.5":[2,0,3,1,5,4]
+                })
     
