@@ -7,12 +7,15 @@ class Loader:#主要作用是给出直接可见度
     import time as t
     t0=t.time()
     self.opt=opt
-    
     if os.path.exists(self.opt["out1"]+".json"):
         d0_,nameList0=T.r2(self.opt["out1"])
     else:
         data,nameList0=self.loading()
+        t1=t.time()
+        print("加载时间:"+str(((t1-t0)/60))+" min")
         d0_=self.direct(data)
+        t2=t.time()
+        print("解析时间:"+str(((t2-t1)/60))+" min")
         T.w2(d0_,self.opt["out1"],nameList0)
     print("step1.执行时间："+str(((t.time()-t0)/60))+" min")
     self.result=[nameList0,d0_,t.time()-t0]
@@ -59,9 +62,10 @@ class Loader:#主要作用是给出直接可见度
     number=self.getMax(data)#构件的最大编号
     data2=np.zeros([len(data),number]).tolist()
     for i in range(len(data)):#每一行是一个视点
+        print("getData2:",str(i)+"/"+str(len(data))+"\t\t",end="\r")
         for j in data[i]:
             data2[i][int(j)]=data[i][j]
-    print("视点个数:",len(data2))
+    print("\n视点个数:",len(data2))
     print("构件个数:",number)
     return data2#每一列是一个特征
    def getComponent2group(self,groups_arr):

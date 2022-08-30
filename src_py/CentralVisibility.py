@@ -3,6 +3,8 @@ import math
 import numpy as np
 class CentralVisibility:
     def __init__(self,opt,nameList0,d0_):
+        import time as t
+        t0=t.time()
         self.opt=opt
         if self.opt["CentralVisibility"]:
             config=Tool.loadJson(self.opt["in"]+"/config.json")
@@ -21,6 +23,7 @@ class CentralVisibility:
             nameList_new=nameList0
             d0_new=d0_
         self.result=[nameList_new,d0_new]
+        print("CentralVisibility执行时间:"+str(((t.time()-t0)/60))+" min")
     def getConfig2(self,config):
         max=config["max"]
         min=config["min"]
@@ -87,7 +90,7 @@ class CentralVisibility:
         data2={}
         for i1 in range(step[0]+1):
             for i2 in range(step[1]+1):
-                print(str(i1+1)+"/"+str(step[0]+1)+"   ","\t",str(i2+1)+"/"+str(step[0]+1)+"   ",end="\r")
+                print("getData2:",str(i1+1)+"/"+str(step[0]+1)+"   ","\t",str(i2+1)+"/"+str(step[0]+1)+"   ",end="\r")
                 for i3 in range(step[2]+1):
                     names=self.getNames_round(config1,i1,i2,i3)
                     name2=self.getName(config2,i1,i2,i3)
