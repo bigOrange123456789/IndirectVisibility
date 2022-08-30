@@ -1,6 +1,6 @@
 import numpy as np
 import os
-from Tool import Tool as T
+from lib.Tool import Tool as T
 from lib.Clustering import Clustering
 class ClusteringViewer:
   def __init__(self,d0_,nameList0,opt):

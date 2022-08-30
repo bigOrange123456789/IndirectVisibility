@@ -1,7 +1,7 @@
 import numpy as np
 class Mul:
   def __init__(self,opt,d0,s):
-    from Tool import Tool as T
+    from lib.Tool import Tool as T
     import time as t
     t0=t.time()
     import os

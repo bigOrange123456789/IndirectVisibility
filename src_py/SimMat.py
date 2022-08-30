@@ -3,7 +3,7 @@ import numpy as np
 import os
 class SimMat:
   def __init__(self,opt,e):
-    from Tool import Tool as T
+    from lib.Tool import Tool as T
     import time as t
     t0=t.time()
     self.opt=opt

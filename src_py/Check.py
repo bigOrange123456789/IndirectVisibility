@@ -1,6 +1,7 @@
 import json
 import os
 import math
+from lib.Tool import Tool
 class Check:
   def __init__(self,opt):
     self.opt=opt
@@ -18,12 +19,6 @@ class Check:
   def isNull(self,path):
     if os.path.getsize(path)==0:
         self.jsonPathErr.append(path)#exit(0)
-  @staticmethod
-  def saveJson(path,data):
-    json.dump(
-        data,
-        open(path,"w")
-    )
   def getName(self,config,i1,i2,i3):
     min=config["min"]
     step=config["step"]
@@ -54,7 +49,7 @@ class Check:
         print("没有无法解析的文件")
     else:
         print("error:无法解析的json文件数量为",len(self.jsonPathErr))
-        self.saveJson("jsonPathErr.json",self.jsonPathErr)
+        Tool.saveJson("jsonPathErr.json",self.jsonPathErr)
         exit(0)
     if not flag_nopath:
         print("没有缺失的文件")
@@ -63,4 +58,3 @@ class Check:
         exit(0)
 if __name__ == "__main__":#用于测试
     print()
-

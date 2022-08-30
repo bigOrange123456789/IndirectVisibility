@@ -1,6 +1,6 @@
 import numpy as np
-from Tool import Tool as T
-from ToolG import ToolG as TG
+from lib.Tool import Tool as T
+from lib.ToolG import ToolG as TG
 import time as t
 class Clustering:#目前使用欧式距离
   def __init__(self,opt):

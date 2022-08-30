@@ -4,7 +4,7 @@ class ReduceError:
     import time as t
     t0=t.time()
     self.opt=opt
-    from Tool import Tool as T
+    from lib.Tool import Tool as T
     if opt["step"]==1:#如果没有进行视点合并就不进行误差纠正
         ls1_new=ls1
     elif os.path.exists(self.opt["out1"]):

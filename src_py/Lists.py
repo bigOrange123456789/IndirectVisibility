@@ -1,5 +1,6 @@
 import os
-from Tool import Tool as T
+from lib.Tool import Tool as T
+from lib.ToolG import ToolG as TG
 import numpy as np
 class Lists:
   def __init__(self,opt,d0,d1,redunList,nameList):
@@ -89,7 +90,6 @@ class Lists:
         list_d.append(index)    
     return list_d
   def getLists_sim(self,d0):
-    from ToolG import ToolG as TG
     lists_d=[]#直接可见度资源列表
     if self.opt["useGPU"]:
         order0=TG.sort(d0)
@@ -115,7 +115,6 @@ class Lists:
             lists_d.append(list_d)
     return lists_d
   def getLists(self,d0,d1):
-    from ToolG import ToolG as TG
     lists=[]
     lists_d=[]#直接可见度资源列表
     lists_i=[]#间接可见度资源列表

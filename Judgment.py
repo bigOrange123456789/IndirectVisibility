@@ -1,31 +1,11 @@
-from start import IndirectVisibility
-import os
-def del_file(path_data):#删除文件夹下面的所有文件(只删除文件,不删除文件夹)
-    for i in os.listdir(path_data) :# os.listdir(path_data)#返回一个列表，里面是当前目录下面的所有东西的相对路径
-        file_data = path_data + "\\" + i#当前文件夹的下面的所有东西的绝对路径
-        if os.path.isfile(file_data) == True:#os.path.isfile判断是否为文件,如果是文件,就删除.如果是文件夹.递归给del_file.
-            os.remove(file_data)
-        else:
-            del_file(file_data)
+import sys
+sys.path.append("src_py")
+from Main import Main as IndirectVisibility
 class Judgment:
     def __init__(self):
         self.flagNumber=1
-    def remove(self,dir_path):
-        if not os.path.exists(dir_path):
-            return
-        if os.path.isfile(dir_path):
-            try:
-                os.remove(dir_path) # 这个可以删除单个文件，不能删除文件夹
-            except BaseException as e:
-                print(e)
-        elif os.path.isdir(dir_path):
-            file_lis = os.listdir(dir_path)
-            for file_name in file_lis:
-                # if file_name != 'wibot.log':
-                tf = os.path.join(dir_path, file_name)
-                self.remove(tf)
     def judgment(self,tag,config,result):
-        self.remove("out")
+        IndirectVisibility.remove("out")
         print(str(self.flagNumber)+":开始"+tag)
         self.assert0(
             IndirectVisibility(config).ls,

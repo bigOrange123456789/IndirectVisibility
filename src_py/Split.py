@@ -2,7 +2,7 @@ import json
 import os
 class Split:#主要作用是给出直接可见度
    def __init__(self,opt,groups_arr):
-    from Tool import Tool as T
+    from lib.Tool import Tool as T
     import time as t
     t0=t.time()
     self.opt=opt

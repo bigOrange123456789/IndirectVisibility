@@ -1,4 +1,4 @@
-from Tool import Tool
+from lib.Tool import Tool
 import math
 import numpy as np
 class CentralVisibility:

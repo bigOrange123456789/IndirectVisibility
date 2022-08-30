@@ -1,14 +1,23 @@
 import numpy as np
 import os
-from Tool import Tool as T
+from lib.Tool import Tool as T
 from lib.Clustering import Clustering
 class ClusteringComponent:
   def __init__(self,d0_,opt):
     self.opt=opt
-    d0,groups_arr=self.clustering(
-        d0_,
-        self.opt["step_component"])
-    # T.saveJson(opt["out2.groups_arr"]+".json",groups_arr)
+    if os.path.exists(self.opt["out.ClusteringComponent.groups_arr"]+".json") :
+      groups_arr=T.loadJson(self.opt["out.ClusteringComponent.groups_arr"]+".json")
+      if self.opt["multidirectionalSampling"]:
+        d0=[]
+      else:
+        d0=T.loadJson(self.opt["out.ClusteringComponent.d0"]+".json")
+    else:
+      d0,groups_arr=self.clustering(
+          d0_,
+          self.opt["step_component"]
+      )
+      T.saveJson(self.opt["out.ClusteringComponent.groups_arr"]+".json",groups_arr)
+      T.saveJson(self.opt["out.ClusteringComponent.d0"]+".json",d0)
     self.result=[d0,groups_arr]#d0,nameList,redunList
 
   def clustering(self,dataSet,step):
