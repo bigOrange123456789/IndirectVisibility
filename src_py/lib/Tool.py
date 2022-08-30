@@ -143,16 +143,13 @@ class Tool:
    def loadJson(path):
        import json
        return json.load(open(path))
-   @staticmethod
-   def saveJson(path,data):
-        if path=="":
-            return 
-        import json
-        with open(path, 'w') as write_f:
-            write_f.write(json.dumps(data, indent=4, ensure_ascii=False))
 #    @staticmethod
 #    def saveJson(path,data):
-#         json.dump(
-#             data,
-#             open(path,"w")
-#         )
+#         if path=="":
+#             return 
+#         import json
+#         with open(path, 'w') as write_f:
+#             write_f.write(json.dumps(data, indent=4, ensure_ascii=False))
+   @staticmethod
+   def saveJson(path,data):
+        json.dump(data,open(path,"w"))

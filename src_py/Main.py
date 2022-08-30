@@ -8,6 +8,7 @@ from ClusteringComponent import ClusteringComponent
 from NoiseReduction import NoiseReduction  #3.获取特征,通过特征矩阵进行降噪
 from SimMat import SimMat
 from Lists import Lists
+from List2Arr import List2Arr
 from Mul import Mul
 from ReduceError import ReduceError
 
@@ -42,7 +43,9 @@ class Main:
         "sim":False,#True,#是否简化计算流程 #简化流程后只计算直接可见度，不计算间接可见度
         "out6_i":"./"+out+"/6.ls_i",#资源加载列表，txt.json
         "out7_d":"./"+out+"/7.ls_d",
-        "areaMin":64,#构件的投影面积小于这个数值视为不可见
+        "out7_d_arr":"./"+out+"/7.ls_d_arr",
+        "out7_d_index":"./"+out+"/7.ls_d_index",
+        "areaMin":0,#构件的投影面积小于这个数值视为不可见 #在ReduceError.py中发挥作用
         "multidirectionalSampling":False,#True,#False,#True,#不同方向的采样结果分开存储
         'startNow':False,#是否在对象初始化阶段执行start()方法
         }
@@ -68,6 +71,7 @@ class Main:
       
     print('6.计算资源加载列表')
     ls,ls1,ls2,nameList,t6=Lists(self.opt,d0,d1,redunList,nameList).result
+    ls1_arr,ls1_index=List2Arr(self.opt,ls1,nameList).result
     print('7.缩小误差')
     ls1,t7=ReduceError(self.opt,d0_,nameList0,ls1,nameList).result#self.reduceError(d0_,nameList0,ls1,nameList)
     print("step2.执行时间："+str((t2/60/1000))+" min")

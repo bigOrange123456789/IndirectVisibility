@@ -19,13 +19,23 @@ class Check:
   def isNull(self,path):
     if os.path.getsize(path)==0:
         self.jsonPathErr.append(path)#exit(0)
-  def getName(self,config,i1,i2,i3):
+  @staticmethod
+  def getName(config,i1,i2,i3):
     min=config["min"]
     step=config["step"]
     max=config["max"]
-    x0=min[0]+(max[0]-min[0])*i1/step[0]
-    y0=min[1]+(max[1]-min[1])*i2/step[1]
-    z0=min[2]+(max[2]-min[2])*i3/step[2]
+    if step[0]==0:
+        x0=min[0]
+    else:
+        x0=min[0]+(max[0]-min[0])*i1/step[0]
+    if step[1]==0:
+        y0=min[1]
+    else:
+        y0=min[1]+(max[1]-min[1])*i2/step[1]
+    if step[2]==0:
+        z0=min[2]
+    else:
+        z0=min[2]+(max[2]-min[2])*i3/step[2]
     if math.floor(x0)==x0:x0=int(x0)
     if math.floor(y0)==y0:y0=int(y0)
     if math.floor(z0)==z0:z0=int(z0)
