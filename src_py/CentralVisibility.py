@@ -1,20 +1,26 @@
 from Tool import Tool
 import math
+import numpy as np
 class CentralVisibility:
     def __init__(self,opt,nameList0,d0_):
         self.opt=opt
-        config=Tool.loadJson(self.opt["in"]+"/config.json")
-        config2=self.getConfig2(config)
-        Tool.saveJson(self.opt["out.config2"]+".json",config2)
-        data={}
-        for i in range(len(nameList0)):
-            data[nameList0[i]]=d0_[i]
-            
-        print(config)
-        print(config2)
-        print("nameList0",nameList0)
-        print("d0_",d0_)
-        exit(0)
+        if self.opt["CentralVisibility"]:
+            config=Tool.loadJson(self.opt["in"]+"/config.json")
+            config2=self.getConfig2(config)
+            Tool.saveJson(self.opt["out.config2"]+".json",config2)
+            data={}
+            for i in range(len(nameList0)):
+                data[nameList0[i]]=d0_[i]
+            data2=self.getData2(config,config2,data)
+            nameList_new=[]
+            d0_new=[]
+            for i in data2:
+                nameList_new.append(i)
+                d0_new.append(data2[i])
+        else:
+            nameList_new=nameList0
+            d0_new=d0_
+        self.result=[nameList_new,d0_new]
     def getConfig2(self,config):
         max=config["max"]
         min=config["min"]
@@ -49,9 +55,18 @@ class CentralVisibility:
         min=config["min"]
         step=config["step"]
         max=config["max"]
-        x0=min[0]+(max[0]-min[0])*i1/step[0]
-        y0=min[1]+(max[1]-min[1])*i2/step[1]
-        z0=min[2]+(max[2]-min[2])*i3/step[2]
+        if step[0]==0:
+            x0=min[0]
+        else:
+            x0=min[0]+(max[0]-min[0])*i1/step[0]
+        if step[1]==0:
+            y0=min[1]
+        else:
+            y0=min[1]+(max[1]-min[1])*i2/step[1]
+        if step[2]==0:
+            z0=min[2]
+        else:
+            z0=min[2]+(max[2]-min[2])*i3/step[2]
         if math.floor(x0)==x0:x0=int(x0)
         if math.floor(y0)==y0:y0=int(y0)
         if math.floor(z0)==z0:z0=int(z0)
@@ -67,7 +82,7 @@ class CentralVisibility:
             self.getName(config1,i1+1,i2+1,i3),
             self.getName(config1,i1+1,i2+1,i3+1),
         ]
-    def getData2(self,config1,config2,direct):
+    def getData2(self,config1,config2,data):
         step=config2["step"]
         data2={}
         for i1 in range(step[0]+1):
@@ -75,15 +90,9 @@ class CentralVisibility:
                 print(str(i1+1)+"/"+str(step[0]+1)+"   ","\t",str(i2+1)+"/"+str(step[0]+1)+"   ",end="\r")
                 for i3 in range(step[2]+1):
                     names=self.getNames_round(config1,i1,i2,i3)
-                    data0={}
+                    name2=self.getName(config2,i1,i2,i3)
+                    data2[name2]=[]
                     for name in names:
-                        data_file=getJson("all/"+name+".json")
-                        # print("all/"+name+".json")
-                        data0_=data_file[direct]#data0_=data["all/"+name+".json"][direct]#{"1":0.5}#
-                        for index_path in data0_:
-                            if index_path in data0:#if data0[index_path]:
-                                data0[index_path]=data0[index_path]+data0_[index_path]
-                            else:
-                                data0[index_path]=data0_[index_path]
-                    #path="all"+direct+"/"+getName(config2,i1,i2,i3)+".json"
-                    #saveJson(path,data0)#data2[path]=data0
+                        data2[name2].append(data[name])
+                    data2[name2]=np.array(data2[name2]).sum(axis=0).tolist()
+        return data2
