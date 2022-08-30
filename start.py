@@ -3,6 +3,7 @@ import sys
 sys.path.append("src_py")
 from Check import Check
 from Loader import Loader  #1.直接可见度
+from CentralVisibility import CentralVisibility  
 from ClusteringViewer import ClusteringViewer  #2.去除冗余视点
 from ClusteringComponent import ClusteringComponent
 from NoiseReduction import NoiseReduction  #3.获取特征,通过特征矩阵进行降噪
@@ -21,6 +22,7 @@ class IndirectVisibility:
     self.mkdir(out)
     self.opt={
         "in":"./in/test.json",
+        "out.config2":"./"+out+"/config2",#直接可见度矩阵，txt
         "out1":"./"+out+"/1.direct",#直接可见度矩阵，txt
         "out2":"./"+out+"/2.redunList.json",#冗余视点列表
         "out2.d0":"./"+out+"/2.d0",
@@ -81,6 +83,7 @@ class IndirectVisibility:
     print('1.直接可见度')#第一步必须要执行
     loader=Loader(self.opt)
     nameList0,d0_,t1=loader.result
+    CentralVisibility(self.opt,nameList0,d0_)
     print("2.去除冗余(构件)")
     d0_,groups_arr=ClusteringComponent(d0_,self.opt).result
     #如果是多方向采样下面的计算过程中不需要d0_ #print(groups_arr)
@@ -98,23 +101,40 @@ class IndirectVisibility:
     print("总执行时间："+str(((tl-t0)/60))+" min")
     #以下代码用于测试中的断言
     self.ls={}
-    print(ls)
     for i in range(len(self.nameList)):
       self.ls[self.nameList[i]]=ls[i]
-# if __name__ == "__main__":#用于测试
-#     print('version:2022.08.28-1')
-#     # iv=IndirectVisibility({"in":"in/test"})
-#     iv=IndirectVisibility({"in":"in/test_sort"})
-#     iv.opt["sim"]=False#True#
-#     iv.opt["step"]=1
-#     iv.opt["useGPU"]=False
-#     iv.opt["step_component"]=1
-#     iv.opt["groups_outEachStep"]=True
-#     iv.start()
+  def remove(self,dir_path):
+        import os
+        if not os.path.exists(dir_path):
+            return
+        if os.path.isfile(dir_path):
+            try:
+                os.remove(dir_path) # 这个可以删除单个文件，不能删除文件夹
+            except BaseException as e:
+                print(e)
+        elif os.path.isdir(dir_path):
+            file_lis = os.listdir(dir_path)
+            for file_name in file_lis:
+                # if file_name != 'wibot.log':
+                tf = os.path.join(dir_path, file_name)
+                self.remove(tf)
+    
 if __name__ == "__main__":#用于测试
     print('version:2022.08.28-1')
     # iv=IndirectVisibility({"in":"in/test"})
+    iv=IndirectVisibility({"in":"in/test_sort"})
+    iv.remove("out")
+    iv.opt["sim"]=False#True#
+    iv.opt["step"]=1
+    iv.opt["useGPU"]=False
+    iv.opt["step_component"]=1
+    iv.opt["groups_outEachStep"]=True
+    iv.start()
+if False:#if __name__ == "__main__":#用于测试
+    print('version:2022.08.28-1')
+    # iv=IndirectVisibility({"in":"in/test"})
     iv=IndirectVisibility({"in":"in/test_component2_multidirection"})
+    iv.remove("out")
     iv.opt0["sim"]=False#True#
     iv.opt0["step"]=1
     iv.opt0["useGPU"]=False
