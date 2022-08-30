@@ -11,6 +11,7 @@ class CentralVisibility:
             config2=self.getConfig2(config)
             Tool.saveJson(self.opt["out.config2"]+".json",config2)
             data={}
+            assert len(nameList0)==len(d0_)
             for i in range(len(nameList0)):
                 data[nameList0[i]]=d0_[i]
             data2=self.getData2(config,config2,data)
@@ -98,4 +99,5 @@ class CentralVisibility:
                     for name in names:
                         data2[name2].append(data[name])
                     data2[name2]=np.array(data2[name2]).sum(axis=0).tolist()
+        print()
         return data2

@@ -88,8 +88,9 @@ class Main:
     Check(self.opt)
     print('1.直接可见度')#第一步必须要执行
     loader=Loader(self.opt)
-    nameList0,d0_,t1=loader.result
-    nameList0,d0_=CentralVisibility(self.opt,nameList0,d0_).result
+    nameList0_old,d0_,t1=loader.result
+    nameList0,d0_=CentralVisibility(self.opt,nameList0_old,d0_).result
+    # exit(0)
     print("2.去除冗余(构件)")
     d0_,groups_arr=ClusteringComponent(d0_,self.opt).result
     #如果是多方向采样下面的计算过程中不需要d0_ #print(groups_arr)
@@ -97,7 +98,7 @@ class Main:
       for direct in loader.dataSplit:
         data0=loader.dataSplit[direct]#某个方向上的数据
         d0_=loader.directSplit(data0,groups_arr)#每个方向单独计算直接可见度
-        nameList0,d0_=CentralVisibility(self.opt,nameList0,d0_).result
+        nameList0,d0_=CentralVisibility(self.opt,nameList0_old,d0_).result#[nameList0,d0_]似乎是残缺的
         self.optSet("out"+direct)
         ls=self.process(d0_,nameList0)
     else:
