@@ -21,7 +21,7 @@ class Main:
   def optSet(self,out):
     self.mkdir(out)
     self.opt={
-        "in":"./in/test.json",
+        "in":"./in",
         "out.config2":"./"+out+"/config2",#直接可见度矩阵，txt
         "out.ClusteringComponent.groups_arr":"./"+out+"/ClusteringComponent.groups_arr",#元素聚类后的分组情况
         "out.ClusteringComponent.d0":"./"+out+"/ClusteringComponent.d0",

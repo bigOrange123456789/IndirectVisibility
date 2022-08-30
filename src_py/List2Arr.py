@@ -6,8 +6,11 @@ class List2Arr:
         for i in range(len(ls1)):
             list[nameList[i]]=ls1[i]
         self.opt=opt
-        config2=Tool.loadJson(self.opt["out.config2"]+".json")
-        list_arr,list_index=self.process(config2,list)
+        if opt["CentralVisibility"]:#更新了config
+            config=Tool.loadJson(self.opt["out.config2"]+".json")
+        else:#没有更新config
+            config=Tool.loadJson(self.opt["in"]+"/config.json")
+        list_arr,list_index=self.process(config,list)
         Tool.saveJson(opt["out7_d_arr"],list_arr)
         Tool.saveJson(opt["out7_d_index"],list_index)
         self.result=[list_arr,list_index]
