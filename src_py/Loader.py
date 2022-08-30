@@ -1,5 +1,6 @@
 import json
 import os
+import numpy as np
 class Loader:#主要作用是给出直接可见度
    def __init__(self,opt):
     from lib.Tool import Tool as T
@@ -56,18 +57,14 @@ class Loader:#主要作用是给出直接可见度
     return max+1
    def direct(self,data):#获得直接可见度
     number=self.getMax(data)#构件的最大编号
-    data2=[]
+    data2=np.zeros([len(data),number]).tolist()
     for i in range(len(data)):#每一行是一个视点
-        data2.append([])
-        for j in range(number):
-            data2[i].append(0)
         for j in data[i]:
             data2[i][int(j)]=data[i][j]
     print("视点个数:",len(data2))
     print("构件个数:",number)
     return data2#每一列是一个特征
    def getComponent2group(self,groups_arr):
-    import numpy as np
     max=0
     for i in groups_arr:
         print(i)
@@ -85,11 +82,8 @@ class Loader:#主要作用是给出直接可见度
     #groups_arr
     component2group=self.getComponent2group(groups_arr)
     number=len(groups_arr) # self.getMax(data)#构件的最大编号
-    data2=[]
+    data2=np.zeros([len(data),number]).tolist()
     for i in range(len(data)):#每一行是一个视点
-        data2.append([])
-        for j in range(number):
-            data2[i].append(0)
         for j in data[i]:
             group_id=component2group[int(j)]
             data2[i][group_id]=data[i][j]
