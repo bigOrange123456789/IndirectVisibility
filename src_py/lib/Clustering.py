@@ -20,10 +20,10 @@ class Clustering:#目前使用欧式距离
     dataSet=np.mat(dataSet)
     m = np.shape(dataSet)[0] #数据集的行数(个数)
     clusterAssment = np.mat(np.zeros((m, 2)))# m*2的零矩阵 用来记录每个点最近的中心和距离
-    clusterChanged = True
+    nextFlag = True
     timer=0#记录迭代次数
-    while clusterChanged:#直到聚类结果不变时再停止
-        clusterChanged = False
+    while nextFlag:#直到聚类结果不变时再停止
+        nextFlag = False
         if self.opt["useGPU"]:
             distTG=TG.getDist(centroids,dataSet)#每个行向量到每个中心的距离
         for i in range(m): #寻找每个元素最近的质心  #遍历每个元素
@@ -39,7 +39,7 @@ class Clustering:#目前使用欧式距离
                     minDist = distJI
                     minIndex = j#质心编号
             if clusterAssment[i, 0] != minIndex:
-                clusterChanged = True
+                nextFlag = True
             clusterAssment[i, :] = minIndex, minDist # 每个元素：【质心编号，到质心的距离】
         nullNumber=0#记录空集个数
         for cent in range(k):   #更新质心的位置   #遍历所有质心
@@ -96,9 +96,9 @@ class Clustering:#目前使用欧式距离
     m = self.m#数据集的行数(个数)
     k = self.k
     dataSet=self.dataSet
-    clusterChanged = True
-    if True:#只执行一次 #while clusterChanged:#直到聚类结果不变时再停止
-        clusterChanged = False
+    nextFlag = True
+    if True:#只执行一次 #while nextFlag:#直到聚类结果不变时再停止
+        nextFlag = False
         if self.opt["useGPU"]:
             distTG=TG.getDist(centroids,dataSet)#每个行向量到每个中心的距离
         for i in range(m): #寻找每个元素最近的质心  #遍历每个元素
@@ -114,7 +114,7 @@ class Clustering:#目前使用欧式距离
                     minDist = distJI
                     minIndex = j#质心编号
             if clusterAssment[i, 0] != minIndex:
-                clusterChanged = True
+                nextFlag = True
             clusterAssment[i, :] = minIndex, minDist # 每个元素：【质心编号，到质心的距离】
         nullNumber=0#记录空集个数
         for cent in range(k):   #更新质心的位置   #遍历所有质心
@@ -127,11 +127,13 @@ class Clustering:#目前使用欧式距离
         self.timer=self.timer+1
         print("空集比例:"+str(nullNumber)+"/"+str(k)+"\t迭代次数:"+str(self.timer),"\t迭代计算耗时:"+str((t.time()-t0)/60/1000),"min\t\t")
     print()
-    return centroids,clusterAssment,clusterChanged#质心 类别 是否结束    #return centroids.tolist(), clusterAssment.tolist()   # 返回：质心，每个元素的类别 
+    return centroids,clusterAssment,nextFlag#质心 类别 是否结束    #return centroids.tolist(), clusterAssment.tolist()   # 返回：质心，每个元素的类别 
   def kMeans_one2(self,dataSet, step):
     self.dataSet=np.array(dataSet)
     self.k= int(np.shape(dataSet)[0]/step)#质心个数
     self.centroids = self.dataSet[ (np.array(range(self.k))*step).tolist(),:]             #np.mat(np.zeros((k, n)))#用于存储所有质心
+    # print("self.dataSet",self.dataSet)
+    # print("self.centroids",self.centroids)
     return  self.centroids, [],True#return  centers.tolist(), classifications.tolist()
   def kMeans_next2(self):#dataSet中每一行是一个元素#只进行一次迭代
     data=self.dataSet
@@ -139,9 +141,17 @@ class Clustering:#目前使用欧式距离
     k=self.k    
     classifications = np.argmin(((data[:, :, None] - centers.T[None, :, :])**2).sum(axis=1), axis=1)#计算每个元素最近的质心
     new_centers = np.array([data[classifications == j, :].mean(axis=0) for j in range(k)])# 对每个新的簇计算簇中心
-    clusterChanged=not (new_centers == centers).all()#是否进行下一次迭代 
+    nextFlag=not (new_centers == centers).all()#是否进行下一次迭代 
+    if nextFlag:
+        import math
+        def cleanedList(centers0): 
+            return np.array([x.tolist() for x in centers0 if (math.isnan(x[0]) == False)])
+        new_centers_clean=cleanedList(new_centers)
+        centers_clean=cleanedList(centers)
+        if new_centers_clean.shape[0] ==centers_clean.shape[0]:
+            nextFlag=not (new_centers_clean == centers_clean).all()
     self.centroids=new_centers
-    return new_centers,classifications[:, None],clusterChanged#质心 类别 是否进行下一次迭代    #return centroids.tolist(), clusterAssment.tolist()   # 返回：质心，每个元素的类别 
+    return new_centers,classifications[:, None],nextFlag#质心 类别 是否进行下一次迭代    #return centroids.tolist(), clusterAssment.tolist()   # 返回：质心，每个元素的类别 
   def getRedundancy(self,clustAssing,k,tagList):#每个元素的类别，质心个数
     result=[]
     for i in range(len(clustAssing)):

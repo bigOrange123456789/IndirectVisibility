@@ -95,6 +95,7 @@ class Main:
     d0_,groups_arr=ClusteringComponent(d0_,self.opt).result
     #如果是多方向采样下面的计算过程中不需要d0_ #print(groups_arr)
     if self.opt["multidirectionalSampling"]:
+      self.opt0["out.config2"]=self.opt["out.config2"]#config2的存储位置不变
       for direct in loader.dataSplit:
         data0=loader.dataSplit[direct]#某个方向上的数据
         d0_=loader.directSplit(data0,groups_arr)#每个方向单独计算直接可见度

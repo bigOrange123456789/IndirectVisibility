@@ -26,10 +26,10 @@ class ClusteringComponent:
     dataSet=np.array(dataSet).T.tolist()
     if self.opt["groups_outEachStep"]:
       clustering=Clustering(self.opt)
-      centroids, clustAssing, clusterChanged =clustering.kMeans_one(dataSet,step)
+      centroids, clustAssing, nextFlag =clustering.kMeans_one(dataSet,step)
       group_index=0
-      while clusterChanged:
-        centroids, clustAssing, clusterChanged =clustering.kMeans_next()
+      while nextFlag:
+        centroids, clustAssing, nextFlag =clustering.kMeans_next()
         group_index=group_index+1
         groups_arr=self.get_groups_arr(clustAssing.tolist())
         T.saveJson(self.opt["out2.groups_arr"]+str(group_index)+".json",groups_arr)
