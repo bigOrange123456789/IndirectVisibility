@@ -1,0 +1,11 @@
+{
+    "in":"1.move_all",
+    "CentralVisibility":true,
+    "groups_outEachStep":true,
+    "step":1,
+    "step_component":1,
+    "useGPU":false,
+    "sim":true,
+    "multidirectionalSampling":true,
+    "out1":""
+}

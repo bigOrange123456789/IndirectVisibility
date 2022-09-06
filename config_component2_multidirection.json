@@ -1,0 +1,10 @@
+{
+    "in":"in/test_component2_multidirection",
+    "CentralVisibility":true,
+    "groups_outEachStep":true,
+    "step":1,
+    "step_component":2,
+    "useGPU":false,
+    "sim":false,
+    "multidirectionalSampling":true
+}

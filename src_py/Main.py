@@ -129,4 +129,14 @@ class Main:
                 tf = os.path.join(dir_path, file_name)
                 Main.remove(tf)
 if __name__ == "__main__":#用于测试
-    print()
+  import sys
+  from lib.Tool import Tool
+  if len(sys.argv)<2:
+    print("ERR:请指定config.json的路径")
+    exit(0)
+  path=sys.argv[1]
+  config=Tool.loadJson(path)
+  iv=Main(config)
+  iv.remove("out")
+  iv.start()
+  

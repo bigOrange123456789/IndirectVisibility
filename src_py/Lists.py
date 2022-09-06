@@ -111,8 +111,10 @@ class Lists:
             index2=np.argsort(-np.array(values))
             return np.array(keys)[index2].tolist()
         for i in range(len(d0)):#对每一行进行排序
+            print("sort",i,"/",len(d0),"\t\t\t",end="\r")
             list_d=sort(d0[i])
             lists_d.append(list_d)
+        print()
     return lists_d
   def getLists(self,d0,d1):
     lists=[]
