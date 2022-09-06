@@ -4,6 +4,16 @@ from lib.Tool import Tool as T
 from lib.Clustering import Clustering
 class ClusteringComponent:
   def __init__(self,d0_,opt):
+    if len(d0_)==0:
+        print("视点个数为0!")
+        exit(0)
+    if opt["step_component"]==1:#步长为1则跳过构件聚类
+      component_num=len(d0_[0])
+      groups_arr=[]
+      for i in range(component_num):
+        groups_arr.append([i])
+      self.result=[d0_,groups_arr]
+      return
     self.opt=opt
     if os.path.exists(self.opt["out.ClusteringComponent.groups_arr"]+".json") :
       groups_arr=T.loadJson(self.opt["out.ClusteringComponent.groups_arr"]+".json")

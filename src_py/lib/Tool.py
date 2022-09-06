@@ -152,4 +152,6 @@ class Tool:
 #             write_f.write(json.dumps(data, indent=4, ensure_ascii=False))
    @staticmethod
    def saveJson(path,data):
+        if path=="" or path==".json":
+            return
         json.dump(data,open(path,"w"))

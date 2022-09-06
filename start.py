@@ -14,7 +14,7 @@ if False:#if __name__ == "__main__":#if False:# 用于测试
     iv.opt0["groups_outEachStep"]=True
     iv.opt0["CentralVisibility"]=True
     iv.start()
-if __name__ == "__main__":#用于测试
+if False:#if __name__ == "__main__":#用于测试
     print('version:2022.08.28-1')
     # iv=IndirectVisibility({"in":"in/test"})
     iv=IndirectVisibility({"in":"in/test_component2_multidirection"})
@@ -37,3 +37,13 @@ if False:#用于测试
     iv.opt["step_component"]=2
     iv.opt["groups_outEachStep"]=True
     iv.start()
+import sys
+from lib.Tool import Tool
+if __name__ == "__main__":
+    path=sys.argv[1]
+    config=Tool.loadJson(path)
+    iv=IndirectVisibility(config)
+    iv.remove("out")
+    iv.start()
+  
+    

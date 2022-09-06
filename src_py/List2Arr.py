@@ -11,8 +11,8 @@ class List2Arr:
         else:#没有更新config
             config=Tool.loadJson(self.opt["in"]+"/config.json")
         list_arr,list_index=self.process(config,list)
-        Tool.saveJson(opt["out7_d_arr"],list_arr)
-        Tool.saveJson(opt["out7_d_index"],list_index)
+        Tool.saveJson(opt["out7_d_arr"]+".json",list_arr)
+        Tool.saveJson(opt["out7_d_index"]+".json",list_index)
         self.result=[list_arr,list_index]
 
     def process(self,config,list):
