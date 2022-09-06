@@ -1,9 +1,9 @@
 from lib.Tool import Tool
 import math
 import numpy as np
+import time as t
 class CentralVisibility:
     def __init__(self,opt,nameList0,d0_):
-        import time as t
         t0=t.time()
         self.opt=opt
         if self.opt["CentralVisibility"]:
@@ -87,11 +87,12 @@ class CentralVisibility:
             self.getName(config1,i1+1,i2+1,i3+1),
         ]
     def getData2(self,config1,config2,data):
+        t0=t.time()
         step=config2["step"]
         data2={}
         for i1 in range(step[0]+1):
             for i2 in range(step[1]+1):
-                print("getData2:",str(i1+1)+"/"+str(step[0]+1)+"   ","\t",str(i2+1)+"/"+str(step[0]+1)+"   ",end="\r")
+                print("CentralVisibility getData2:",str(i1+1)+"/"+str(step[0]+1),"\t",str(i2+1)+"/"+str(step[0]+1)+"   ",end="\r")
                 for i3 in range(step[2]+1):
                     names=self.getNames_round(config1,i1,i2,i3)
                     name2=self.getName(config2,i1,i2,i3)
@@ -99,5 +100,5 @@ class CentralVisibility:
                     for name in names:
                         data2[name2].append(data[name])
                     data2[name2]=np.array(data2[name2]).sum(axis=0).tolist()
-        print()
+        print("CentralVisibility getData2:",str(((t.time()-t0)/60))+" min")
         return data2

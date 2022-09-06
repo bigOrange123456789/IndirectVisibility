@@ -1,0 +1,10 @@
+{
+    "in":"in/test_sort2",
+    "CentralVisibility":false,
+    "groups_outEachStep":true,
+    "step":1,
+    "step_component":1,
+    "useGPU":false,
+    "sim":false,
+    "multidirectionalSampling":false
+}

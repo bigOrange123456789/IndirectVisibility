@@ -89,8 +89,8 @@ class Main:
     print('1.直接可见度')#第一步必须要执行
     loader=Loader(self.opt)
     nameList0_old,d0_,t1=loader.result
-    nameList0,d0_=CentralVisibility(self.opt,nameList0_old,d0_).result
-    # exit(0)
+    if not self.opt["multidirectionalSampling"] or not self.opt["step_component"]==1:
+      nameList0,d0_=CentralVisibility(self.opt,nameList0_old,d0_).result#如果在多方向采样且不用去除冗余构件的情况下这里不用执行
     print("2.去除冗余(构件)")
     d0_,groups_arr=ClusteringComponent(d0_,self.opt).result
     #如果是多方向采样下面的计算过程中不需要d0_ #print(groups_arr)
