@@ -60,6 +60,7 @@ class Loader:#主要作用是给出直接可见度
     return max+1
    def direct(self,data):#获得直接可见度
     number=self.getMax(data)#构件的最大编号
+    print("正在给data2(直接可见度矩阵)分配空间")
     data2=np.zeros([len(data),number]).tolist()
     for i in range(len(data)):#每一行是一个视点
         print("getData2:",str(i)+"/"+str(len(data))+"\t\t",end="\r")
@@ -67,7 +68,7 @@ class Loader:#主要作用是给出直接可见度
             data2[i][int(j)]=data[i][j]
     print("\n视点个数:",len(data2))
     print("构件个数:",number)
-    return data2#每一列是一个特征
+    return data2#行表示视点，列表示构件
    def getComponent2group(self,groups_arr):
     max=0
     for i in groups_arr:
