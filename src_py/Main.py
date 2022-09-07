@@ -21,30 +21,30 @@ class Main:
   def optSet(self,out):
     self.mkdir(out)
     self.opt={
-        "in":"./in",
-        "out.config2":"./"+out+"/config2",#直接可见度矩阵，txt
-        "out.ClusteringComponent.groups_arr":"./"+out+"/ClusteringComponent.groups_arr",#元素聚类后的分组情况
-        "out.ClusteringComponent.d0":"./"+out+"/ClusteringComponent.d0",
-        "out1":"./"+out+"/1.direct",#直接可见度矩阵，txt
+        "in":"in",
+        "out.config2":out+"/config2",#直接可见度矩阵，txt
+        "out.ClusteringComponent.groups_arr":out+"/ClusteringComponent.groups_arr",#元素聚类后的分组情况
+        "out.ClusteringComponent.d0":out+"/ClusteringComponent.d0",
+        "out1":out+"/1.direct",#直接可见度矩阵，txt
         "CentralVisibility":False,#以8个视点的中心为新的视点
-        "out2":"./"+out+"/2.redunList.json",#冗余视点列表
-        "out2.d0":"./"+out+"/2.d0",
-        "out2.groups_arr":"./"+out+"/2.groups_arr",
+        "out2":out+"/2.redunList.json",#冗余视点列表
+        "out2.d0":out+"/2.d0",
+        "out2.groups_arr":out+"/2.groups_arr",
         "groups_outEachStep":False,#是否输出距离过程中每一次迭代的结果
-        "out2.nameList":"./"+out+"/2.nameList",
+        "out2.nameList":out+"/2.nameList",
         "step":2,#聚类个数的步长
         "step_component":1,#构件聚类个数的步长
         "useGPU":True,#是否使用GPU
-        "out3":"./"+out+"/3.e",#特征矩阵，txt
-        "out4":"./"+out+"/4.simMat",#视觉相关度矩阵，txt
-        "out5":"./"+out+"/5.d1",#间接相关度矩阵，txt
-        "out6":"./"+out+"/6.ls",#资源加载列表，txt.json
-        "out6_d":"./"+out+"/6.ls_d",#资源加载列表，txt.json
+        "out3":out+"/3.e",#特征矩阵，txt
+        "out4":out+"/4.simMat",#视觉相关度矩阵，txt
+        "out5":out+"/5.d1",#间接相关度矩阵，txt
+        "out6":out+"/6.ls",#资源加载列表，txt.json
+        "out6_d":out+"/6.ls_d",#资源加载列表，txt.json
         "sim":False,#True,#是否简化计算流程 #简化流程后只计算直接可见度，不计算间接可见度
-        "out6_i":"./"+out+"/6.ls_i",#资源加载列表，txt.json
-        "out7_d":"./"+out+"/7.ls_d",
-        "out7_d_arr":"./"+out+"/7.ls_d_arr",
-        "out7_d_index":"./"+out+"/7.ls_d_index",
+        "out6_i":out+"/6.ls_i",#资源加载列表，txt.json
+        "out7_d":out+"/7.ls_d",
+        "out7_d_arr":out+"/7.ls_d_arr",
+        "out7_d_index":out+"/7.ls_d_index",
         "areaMin":0,#构件的投影面积小于这个数值视为不可见 #在ReduceError.py中发挥作用
         "multidirectionalSampling":False,#True,#False,#True,#不同方向的采样结果分开存储
         'startNow':False,#是否在对象初始化阶段执行start()方法
@@ -53,7 +53,9 @@ class Main:
       self.opt[i]=self.opt0[i]
   def __init__(self,opt):
       self.opt0=opt
-      self.optSet("out")
+      self.outPath=("outPath" in opt) and opt["outPath"] or "out" #A?B:C
+      self.outPath=self.outPath.replace("\\","/")
+      self.optSet(self.outPath)
       if self.opt['startNow']==True:
         self.start()
   def process(self,d0_,nameList0):
@@ -80,7 +82,7 @@ class Main:
     self.nameList=nameList#用于测试中的断言
     return ls#用于测试中的断言
   def start(self):
-    self.optSet("out")
+    self.optSet(self.outPath)
     t0=t.time()
     print("opt")
     for i in self.opt:
@@ -97,10 +99,11 @@ class Main:
     if self.opt["multidirectionalSampling"]:
       self.opt0["out.config2"]=self.opt["out.config2"]#config2的存储位置不变
       for direct in loader.dataSplit:
+        print("[direct "+direct+"]")
         data0=loader.dataSplit[direct]#某个方向上的数据
         d0_=loader.directSplit(data0,groups_arr)#每个方向单独计算直接可见度
         nameList0,d0_=CentralVisibility(self.opt,nameList0_old,d0_).result#[nameList0,d0_]似乎是残缺的
-        self.optSet("out"+direct)
+        self.optSet(self.outPath+"/out"+direct)
         ls=self.process(d0_,nameList0)
     else:
       ls=self.process(d0_,nameList0)
@@ -113,7 +116,7 @@ class Main:
     for i in range(len(self.nameList)):
       self.ls[self.nameList[i]]=ls[i]
   @staticmethod
-  def remove(dir_path):
+  def remove_old(dir_path):
         import os
         if not os.path.exists(dir_path):
             return
@@ -128,6 +131,18 @@ class Main:
                 # if file_name != 'wibot.log':
                 tf = os.path.join(dir_path, file_name)
                 Main.remove(tf)
+  @staticmethod
+  def remove(dir_path):
+    import os
+    # os.walk会得到dir_path下各个后代文件夹和其中的文件的三元组列表，顺序自内而外排列，如 o下有1文件夹，1下有2文件夹：[('o\1\2', [], ['a.py','b']), ('o\1', ['2'], ['c']), ('o', ['1'], [])]
+    for root, dirs, files in os.walk(dir_path, topdown=False):
+        #root: 各级文件夹绝对路径
+        #dirs: root下一级文件夹名称列表，如 ['文件夹1','文件夹2']
+        #files: root下文件名列表，如 ['文件1','文件2']
+        for name in files:# 第一步：删除文件
+            os.remove(os.path.join(root, name))  # 删除文件
+        for name in dirs:# 第二步：删除空文件夹
+            os.rmdir(os.path.join(root, name)) # 删除一个空目录
 if __name__ == "__main__":#用于测试
   import sys
   from lib.Tool import Tool
@@ -137,6 +152,6 @@ if __name__ == "__main__":#用于测试
   path=sys.argv[1]
   config=Tool.loadJson(path)
   iv=Main(config)
-  iv.remove("out")
+  iv.remove(iv.outPath)
   iv.start()
   
