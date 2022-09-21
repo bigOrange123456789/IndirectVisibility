@@ -45,7 +45,9 @@ class Rasterization:  # 基于PCA
                 return 0<=v[0] and v[0]<=w-1 and 0<=v[1] and v[1]<=h-1 and 0<=v[2]
             return pointInScreen(v1) or pointInScreen(v2) or pointInScreen(v3)  
         def clockwise(v1,v2,v3):#判断三个点在屏幕上是否为顺时针
-            return True
+            a=[v2[0]-v1[0],v2[1]-v1[1]]
+            b=[v3[0]-v1[0],v3[1]-v1[1]]
+            return a[0]*b[1]-b[0]*a[1]>0
         def getRectangle(v1,v2,v3,w,h):
             xmin=min(v1[0],v2[0],v3[0])
             xmax=max(v1[0],v2[0],v3[0])
@@ -89,7 +91,7 @@ class Rasterization:  # 基于PCA
             v1=vs[f[0]-1]
             v2=vs[f[t]-1]
             v3=vs[f[2*t]-1]
-            if inScreen(v1,v2,v3,w,h):#三角形可以投影到屏幕上 
+            if inScreen(v1,v2,v3,w,h) and clockwise(v1,v2,v3): #三角形可以投影到屏幕上并且三角面正面朝向相机 
                 depthMin=np.min([v1[2],v2[2],v3[2]])
                 xmin,xmax,ymin,ymax=getRectangle(v1,v2,v3,w,h)
                 i=xmin
