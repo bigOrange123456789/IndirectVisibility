@@ -1,5 +1,6 @@
 {
     "inpath":"E:/gitHubRepositories/SoftRasterization/huayi133",
+    "outpath":"E:\\gitHubRepositories\\IndirectVisibility\\out_img",
     "m":[
         1, 0, 0, 0, 
         0, 0, -1, 0, 
