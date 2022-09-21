@@ -92,8 +92,8 @@ class CentralVisibility:
         data2={}
         for i1 in range(step[0]+1):
             for i2 in range(step[1]+1):
-                print("CentralVisibility getData2:",str(i1+1)+"/"+str(step[0]+1),"\t",str(i2+1)+"/"+str(step[0]+1)+"   ",end="\r")
                 for i3 in range(step[2]+1):
+                    print("CentralVisibility getData2:",str(i1+1)+"/"+str(step[0]+1),";  ",str(i2+1)+"/"+str(step[1]+1),";  ",str(i3+1)+"/"+str(step[2]+1)+"\t",end="\r")
                     names=self.getNames_round(config1,i1,i2,i3)
                     name2=self.getName(config2,i1,i2,i3)
                     data2[name2]=[]
