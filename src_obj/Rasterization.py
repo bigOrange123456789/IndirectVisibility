@@ -4,9 +4,14 @@ class Rasterization:  # 基于PCA
     def __init__(self,matrix,mesh, m,v,p,depthMap,id,idMap):
         self.mesh=mesh
         self.id=id
-        self.CoordinateSystemTransformation(matrix,m,v,p)
+        self.CoordinateSystemTransformation(
+            matrix,
+            m,v,p,
+            depthMap.shape[0],depthMap.shape[1]
+            )
         self.depthMapNew,self.idMapNew=self.getDepthMapNew(depthMap,idMap)
-    def CoordinateSystemTransformation(self,matrix,m,v,p):
+    def CoordinateSystemTransformation(self,matrix,m,v,p,w,h):
+        # print(w,h)
         mesh=self.mesh
         vertex0=mesh.vertex#getVertexHead()
         vertex0=np.array(vertex0)
@@ -21,19 +26,26 @@ class Rasterization:  # 基于PCA
         vertex2=np.dot(vertex1,viewMat)
         vertex3=np.dot(vertex2,projectMat)
 
-        vertex3[:,0]=vertex3[:,0]/vertex3[:,3]
-        vertex3[:,1]=-1*vertex3[:,1]/vertex3[:,3]#除以第四维的原因？
+        vertex3[:,0]=vertex3[:,0]/vertex3[:,3]#-1~1#除以第四维的原因？
+        vertex3[:,0]=(vertex3[:,0]/2+0.5)#vertex3[:,0]=(vertex3[:,0]/2+0.5)*(w-1)# -1~1 -> 0~w
+        vertex3[:,0]=(w-1)*vertex3[:,0]
+        vertex3[:,1]=-1*vertex3[:,1]/vertex3[:,3]#-1~1
+        vertex3[:,1]=(vertex3[:,1]/2+0.5)#vertex3[:,1]=(vertex3[:,1]/2+0.5)*(h-1)# -1~1 -> 0~h
+        vertex3[:,1]=(h-1)*vertex3[:,1]
         vertex4=vertex3[:,0:2]#-1~1
-        vertex4=0.5+vertex4/2#0~1
+        # vertex4=0.5+vertex4/2#0~1
         vertex5=np.c_[vertex4,vertex3[:,2]]#加上深度
 
         mesh.vertex_cst=vertex5
         return vertex5
     def getDepthMapNew(self,depthMap,idMap):
-        def inScreen(v1,v2,v3):
+
+        def inScreen(v1,v2,v3,w,h):
             def pointInScreen(v):
-                return 0<=v[0] and v[0]<=1 and 0<=v[1] and v[1]<=1 
+                return 0<=v[0] and v[0]<=w-1 and 0<=v[1] and v[1]<=h-1 and 0<=v[2]
             return pointInScreen(v1) or pointInScreen(v2) or pointInScreen(v3)  
+        def clockwise(v1,v2,v3):#判断三个点在屏幕上是否为顺时针
+            return True
         def getRectangle(v1,v2,v3,w,h):
             xmin=min(v1[0],v2[0],v3[0])
             xmax=max(v1[0],v2[0],v3[0])
@@ -41,12 +53,12 @@ class Rasterization:  # 基于PCA
             ymax=max(v1[1],v2[1],v3[1])
             xmin=max(0,xmin)
             ymin=max(0,ymin)
-            xmax=min(1,xmax)
-            ymax=min(1,ymax)
-            xmin=math.floor(xmin*(w-1))
-            ymin=math.floor(ymin*(h-1))
-            xmax=math.ceil(xmax*(w-1))
-            ymax=math.ceil(ymax*(h-1))
+            xmax=min(w,xmax)
+            ymax=min(h,ymax)
+            xmin=math.floor(xmin)
+            ymin=math.floor(ymin)
+            xmax=math.ceil(xmax)
+            ymax=math.ceil(ymax)
             return [xmin,xmax,ymin,ymax]
         def getLinearCoefficient(p1,p2,p3,p):
             M=np.array([p1,p2,p3])
@@ -68,33 +80,34 @@ class Rasterization:  # 基于PCA
         m0=self.mesh
         w=depthMap.shape[0]
         h=depthMap.shape[1]
-        #depthMap=np.ones([w,h])
-        # print(depthMap)
         vs=m0.vertex_cst
         test_i=0
-        for f in m0.face:
+        for f in m0.face:#遍历每个三角形
             test_i=test_i+1
             print("m0.face",len(m0.face),test_i,end="\r")
             t=int(len(f)/3)
             v1=vs[f[0]-1]
             v2=vs[f[t]-1]
             v3=vs[f[2*t]-1]
-            if inScreen(v1,v2,v3):#三角形可以投影到屏幕上
+            if inScreen(v1,v2,v3,w,h):#三角形可以投影到屏幕上 
+                depthMin=np.min([v1[2],v2[2],v3[2]])
                 xmin,xmax,ymin,ymax=getRectangle(v1,v2,v3,w,h)
                 i=xmin
                 while i<=xmax:
                     j=ymin
                     while j<=ymax:
-                        p1=[v1[0]*(w-1),v1[1]*(h-1)]
-                        p2=[v2[0]*(w-1),v2[1]*(h-1)]
-                        p3=[v3[0]*(w-1),v3[1]*(h-1)]
-                        d1=v1[2]
-                        d2=v2[2]
-                        d3=v3[2]
-                        p=[i,j]
-                        k1,k2,k3=getLinearCoefficient(p1,p2,p3,p)
-                        if not k1+k2+k3 == 0:
-                            updateDepthMap(depthMap,i,j,k1,k2,k3,d1,d2,d3,idMap)
+                        if depthMin<depthMap[i][j]:#该像素所在位置有可能会看到三角形 
+                            p1=[v1[0],v1[1]]
+                            p2=[v2[0],v2[1]]
+                            p3=[v3[0],v3[1]]
+                            d1=v1[2]
+                            d2=v2[2]
+                            d3=v3[2]
+                        
+                            p=[i,j]
+                            k1,k2,k3=getLinearCoefficient(p1,p2,p3,p)
+                            if not k1+k2+k3 == 0:
+                                updateDepthMap(depthMap,i,j,k1,k2,k3,d1,d2,d3,idMap)
                         j=j+1
                     i=i+1
         return depthMap,idMap

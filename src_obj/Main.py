@@ -30,15 +30,8 @@ class Main:
             for name in dirs:# 第二步：删除空文件夹
                 os.rmdir(os.path.join(root, name)) # 删除一个空目录
     def __init__(self,opt):
-        t0=t.time()
-        w=opt["w"]#800#257
-        h=opt["h"]#800#257
+        self.opt=opt
         inpath=opt["inpath"]
-        outpath=opt["outpath"]
-        self.mkdir(outpath)
-        self.remove(outpath)
-        depthMap=sys.float_info.max*np.ones([w,h])
-        idMap=-1*np.ones([w,h])
 
         matrices_all=self.loadJson(inpath+'/matrices_all.json')
         for e in matrices_all:
@@ -49,20 +42,43 @@ class Main:
                 matrix.append(0)
                 matrix.append(0)
                 matrix.append(1)
-        t1=t.time()
-        for i in range(500):#range(len(matrices_all)):
-            print(i)
+        self.matrices_all=matrices_all
+
+        print("load start")
+        t0=t.time()
+        numTriangular=0
+        self.meshes=[]
+        for i in range(5000):# i in range(500):# range(len(matrices_all)):# # 500-244704 ,51684-15250776
             m0 = Mesh(inpath+'/obj/'+str(i)+'.obj')
-            for matrix in matrices_all[i]:
+            self.meshes.append(m0)
+            numTriangular=numTriangular+len(m0.face)*len(matrices_all[i])
+            print("loading",len(matrices_all),i,end="\t\r")
+        print("加载时间：",(t.time()-t0)/60,"min\t\t\t")
+        print("三角面片总个数：",numTriangular)
+        
+    def render(self,m,v,p):
+        print("render start")
+        t0=t.time()
+        w=self.opt["w"]#800#257
+        h=self.opt["h"]#800#257
+        depthMap=sys.float_info.max*np.ones([w,h])
+        idMap=-1*np.ones([w,h])
+        for i in range(len(self.meshes)):#range(len(matrices_all)):
+            print("rendering",len(self.meshes),i,end="\t\r")
+            m0 = self.meshes[i]
+            for matrix in self.matrices_all[i]:
                 Rasterization(
                     matrix,
                     m0,
-                    opt["m"],opt["v"],opt["p"],
+                    m,v,p,
                     depthMap,#深度图不断更新
                     i, idMap #构件标记图不断更新
                 )
-        print((t1-t0)/60,"min")
-        print((t.time()-t1)/60,"min")
+        print("渲染时间：",(t.time()-t0)/60,"min")
+        
+        outpath=self.opt["outpath"]
+        self.mkdir(outpath)
+        self.remove(outpath)
 
         image=np.ones([w,h,3])
         for i in range(w):
@@ -84,10 +100,12 @@ class Main:
         
 
 if __name__ == "__main__":#用于测试
-  import sys
-  if len(sys.argv)<2:
-    print("ERR:请指定config.json的路径")
-    exit(0)
-  path=sys.argv[1]
-  config=Main.loadJson(path)
-  Main(config)
+    import sys
+    if len(sys.argv)<2:
+        print("ERR:请指定config.json的路径")
+        exit(0)
+    path=sys.argv[1]
+    config=Main.loadJson(path)
+    Main(config).render(
+        config["m"],config["v"],config["p"]
+    )
