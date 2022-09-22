@@ -148,151 +148,82 @@ class Rasterization:  # 基于PCA
                     i=i+1
         return depthMap,idMap
 if __name__ == "__main__":  # 用于测试
-    # a=[
-    #     [0,0,0,0],
-    #     [0,0,1,1],
-    # ]
-    # b=[
-    #     [0,0,2,0],
-    #     [0,0,2,0],
-    # ]
-    # i1=len(a)
-    # i2=len(a[0])
-    # d_A = cuda.to_device(a)
-    # d_B = cuda.to_device(b)
-    # d_C = cuda.to_device(np.zeros((i1,i2)))
-    # addGPU[i1, i2](d_A,d_B,d_C,1)
-    # c=d_C.copy_to_host()
-    # print(c)
-
-
-    # import cupy as cp
-    ################### cupy测试1
-    # x = cp.arange(6).reshape(2, 3).astype('f')
-    # print(x, x.sum(axis=1))
-    # x = cp.arange(6, dtype='f').reshape(2, 3)
-    # y = cp.arange(3, dtype='f')
-    # print("x",x)
-    # print("y",y)
-    # kernel = cp.ElementwiseKernel(
-    #     'float32 x, float32 y',
-    #      'float32 z',
-    #     '''
-    #     z=x*y
-    #     ''',
-    #     'my_kernel')
-    # z=kernel(x, y)
-    # print("z",z)
-    # array([[ 0.,  2.,  4.],
-    #    [ 0.,  4.,  10.]], dtype=float32)
-
-
-    ################### cupy测试2  opengl
-    #https://blog.csdn.net/u013232740/article/details/47355927
     #demo0
-    from OpenGL.GL import *
-    from OpenGL.GLU import *
-    from OpenGL.GLUT import *
+    if False:
+        from OpenGL.GL import *
+        from OpenGL.GLU import *
+        from OpenGL.GLUT import *
  
-    def drawFunc():
-        glClear(GL_COLOR_BUFFER_BIT)
-        # glRotatef(1, 0, 1, 0)
-        glutWireTeapot(0.5)
-        glFlush()
+        def drawFunc():
+            glClear(GL_COLOR_BUFFER_BIT)
+            glutWireTeapot(0.5)
+            glFlush()
  
-    glutInit()
-    glutInitDisplayMode(GLUT_SINGLE | GLUT_RGBA)
-    glutInitWindowSize(400, 400)
-    # 参数为b类型而不是string。我查资料时，很多网上代码未指出导致报错。
-    glutCreateWindow(b"First")
-    glutDisplayFunc(drawFunc)
-    # glutIdleFunc(drawFunc)
-    glutMainLoop()
-    exit(0)
+        glutInit()
+        glutInitDisplayMode(GLUT_SINGLE | GLUT_RGBA)
+        glutInitWindowSize(400, 400)
+        # 参数为b类型而不是string。我查资料时，很多网上代码未指出导致报错。
+        glutCreateWindow(b"First")
+        glutDisplayFunc(drawFunc)
+        # glutIdleFunc(drawFunc)
+        glutMainLoop()
+        exit(0)
 
-    #demo1
-    # from OpenGL.GL import *
-    # from OpenGL.GLU import *
-    # from OpenGL.GLUT import *
+import pygame
+from pygame.locals import *
+from OpenGL.GL import *
+from OpenGL.GLU import *
  
-    # def Draw():
-    #     glClear(GL_COLOR_BUFFER_BIT)
-    #     glRotatef(0.5, 0, 1, 0)
-    #     glutWireTeapot(0.5)
-    #     glFlush()
  
-    # glutInit()
-    # glutInitDisplayMode(GLUT_SINGLE | GLUT_RGBA)
-    # glutInitWindowSize(400, 400)
-    # glutCreateWindow("test")
-    # glutDisplayFunc(Draw)
-    # glutIdleFunc(Draw)
-    # glutMainLoop() 
-
-
-    #https://blog.csdn.net/weixin_39983223/article/details/111450456
-    #pip install PyOpenGL PyOpenGL_accelerate
-    # import pygame
-    # from pygame.locals import *
-    # from OpenGL.GL import *
-    # from OpenGL.GLU import *
-    # pygame.init()
-    # pygame.display.set_mode((640,480))
-    # #---元组定义---
-    # #定义正方体的xyz坐标点
-    # CUBE_POINTS = ((0.5, -0.5, -0.5), (0.5, 0.5, -0.5),(-0.5, 0.5, -0.5), (-0.5, -0.5, -0.5),(0.5, -0.5, 0.5), (0.5, 0.5, 0.5),(-0.5, -0.5, 0.5), (-0.5, 0.5, 0.5))
-    # #定义RGB颜色
-    # CUBE_COLORS = ((1, 0, 0), (1, 1, 0), (0, 1, 0), (0, 0, 0),(1, 0, 1), (1, 1, 1), (0, 0, 1), (0, 1, 1))
-    # # 定义面，四个点构成一个面
-    # CUBE_QUAD_VERTS = ((0, 1, 2, 3), (3, 2, 7, 6), (6, 7, 5, 4),(4, 5, 1, 0), (1, 5, 7, 2), (4, 0, 3, 6))
-    # # 定义线，两个点构成一个线
-    # CUBE_EDGES = ((0,1), (0,3), (0,4), (2,1), (2,3), (2,7),(6,3), (6,4), (6,7), (5,1), (5,4), (5,7),)
-    # #---定义画立方体函数---
-    # def drawcube():
-    #     # "绘制正方体"，zip和list法
-    #     allpoints = list(zip(CUBE_POINTS, CUBE_COLORS))
-    #     #画面积---开始---结束---
-    #     glBegin(GL_QUADS)
-    #     for face in CUBE_QUAD_VERTS:
-    #         for vert in face:
-    #             pos, color = allpoints[vert]
-    #             #在第2个for下面
-    #             glColor3fv(color)
-    #             glVertex3fv(pos)
-    #     #与第1个for对齐
-    #     glEnd()
-        
-    #     #边线颜色黑色
-    #     glColor3f(0, 0, 0)
-        
-    #     # 绘制线---开始---结束---
-    #     glBegin(GL_LINES)
-    #     for line in CUBE_EDGES:
-    #         for vert in line:
-    #             pos, color = allpoints[vert]
-    #             glVertex3fv(pos)
-    #     glEnd()
+#---定义画立方体函数---
+def drawcube():# "绘制正方体"，zip和list法
+    CUBE_POINTS = ((0.5, -0.5, -0.5), (0.5, 0.5, -0.5),(-0.5, 0.5, -0.5), (-0.5, -0.5, -0.5),(0.5, -0.5, 0.5), (0.5, 0.5, 0.5),(-0.5, -0.5, 0.5), (-0.5, 0.5, 0.5))#定义正方体的xyz坐标点
+    CUBE_COLORS = ((1, 0, 0), (1, 1, 0), (0, 1, 0), (0, 0, 0),(1, 0, 1), (1, 1, 1), (0, 0, 1), (0, 1, 1))#定义RGB颜色
+    allpoints = list(zip(CUBE_POINTS, CUBE_COLORS))
     
-    # def main():
-    #     glEnable(GL_DEPTH_TEST)
-    #     #初始化 摄像头
-    #     glMatrixMode(GL_PROJECTION)
-    #     gluPerspective(45.0,640/480.0,0.1,100.0)
-    #     glTranslatef(0.0, 0.0, -3.0)
-    #     glRotatef(25, 1, 0, 0)
+    #画面积---开始---
+    glBegin(GL_QUADS)
+    CUBE_QUAD_VERTS = ((0, 1, 2, 3), (3, 2, 7, 6), (6, 7, 5, 4),(4, 5, 1, 0), (1, 5, 7, 2), (4, 0, 3, 6))# 定义面，四个点构成一个面
+    for face in CUBE_QUAD_VERTS:
+        for vert in face:
+            pos, color = allpoints[vert]
+            glColor3fv(color)
+            glVertex3fv(pos)
+    glEnd()#结束---
+ 
+    #边线颜色黑色
+    glColor3f(0, 0, 0)
 
-    #     #启动循环---
-    #     while True:
-    #         #事件检测
-    #         event = pygame.event.poll()
-    #         #定义退出机制，在pygame的while循环中，这一步必备设置
-    #         if event.type == QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):
-    #             break
-    #         #清除屏幕
-    #         glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT)
-    #         #摄像机旋转
-    #         glRotatef(1,0,1,0)
-    #         drawcube()
-    #         #刷新画面
-    #         pygame.display.flip()
-    # drawcube()#main()
+    # 绘制线---开始---
+    CUBE_EDGES = ((0,1), (0,3), (0,4), (2,1), (2,3), (2,7),(6,3), (6,4), (6,7), (5,1), (5,4), (5,7),)# 定义线，两个点构成一个线
+    glBegin(GL_LINES)
+    for line in CUBE_EDGES:
+        for vert in line:
+            pos, color = allpoints[vert]
+            glVertex3fv(pos)
+    glEnd()#结束---
+ 
+#---主函数---
+def main():
+    #---初始化pygame和定义窗口大小---
+    pygame.init()
+    pygame.display.set_mode((640,480), OPENGL|DOUBLEBUF)#创建一个 OPENGL 渲染的显示 #DOUBLEBUF:双缓冲模式（推荐和 HWSURFACE 或 OPENGL 一起使用）
+ 
+    glEnable(GL_DEPTH_TEST)
+    glMatrixMode(GL_PROJECTION)#初始化 摄像头
+    gluPerspective(45.0,640/480.0,0.1,100.0)#透视相机
+    glTranslatef(0.0, 0.0, -3.0)
+    glRotatef(25, 1, 0, 0)#摄像机旋转
+    
+    while True:#启动循环---
+        event = pygame.event.poll()#事件检测
+        if event.type == QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):break#定义退出机制，在pygame的while循环中，这一步必备设置
+        glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT)#清除屏幕
+        glRotatef(1,0,1,0)#摄像机旋转
+        drawcube()
+        pygame.display.flip()#刷新画面
+ 
+if __name__ == '__main__':
+    main()
+
+    
