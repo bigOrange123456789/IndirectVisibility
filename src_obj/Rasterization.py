@@ -1,6 +1,6 @@
 import numpy as np
 import math
-class Rasterization:  # 基于PCA
+class Rasterization:  
     def __init__(self,matrix,mesh, m,v,p,depthMap,id,idMap):
         self.mesh=mesh
         self.id=id
@@ -11,7 +11,6 @@ class Rasterization:  # 基于PCA
             )
         self.depthMapNew,self.idMapNew=self.getDepthMapNew(depthMap,idMap)
     def CoordinateSystemTransformation(self,matrix,m,v,p,w,h):
-        # print(w,h)
         mesh=self.mesh
         vertex0=mesh.vertex#getVertexHead()
         vertex0=np.array(vertex0)
@@ -55,8 +54,8 @@ class Rasterization:  # 基于PCA
             ymax=max(v1[1],v2[1],v3[1])
             xmin=max(0,xmin)
             ymin=max(0,ymin)
-            xmax=min(w,xmax)
-            ymax=min(h,ymax)
+            xmax=min(w-1,xmax)
+            ymax=min(h-1,ymax)
             xmin=math.floor(xmin)
             ymin=math.floor(ymin)
             xmax=math.ceil(xmax)
