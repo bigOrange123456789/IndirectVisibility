@@ -48,7 +48,7 @@ class Main:
         t0=t.time()
         numTriangular=0
         self.meshes=[]
-        for i in range(len(matrices_all)):#range(5000):# i in range(500):#  # 500-244704 ,51684-15250776
+        for i in range(500):# range(len(matrices_all)):#range(5000):# i in  # 500-244704 ,51684-15250776
             m0 = Mesh(inpath+'/obj/'+str(i)+'.obj')
             self.meshes.append(m0)
             numTriangular=numTriangular+len(m0.face)*len(matrices_all[i])
@@ -57,6 +57,26 @@ class Main:
         print("三角面片总个数：",numTriangular)
         
     def render(self,m,v,p):
+        print("矩阵计算 start")
+        t0=t.time()
+        w=self.opt["w"]#800#257
+        h=self.opt["h"]#800#257
+        depthMap=sys.float_info.max*np.ones([w,h])
+        idMap=-1*np.ones([w,h])
+        for i in range(len(self.meshes)):#range(len(matrices_all)):
+            print("rendering",len(self.meshes),i,end="\t\r")
+            m0 = self.meshes[i]
+            m0.vs2=[]
+            for matrix in self.matrices_all[i]:
+                vertex_cst=Rasterization.CoordinateSystemTransformation(
+                    m0,
+                    matrix,
+                    m,v,p,
+                    depthMap.shape[0],depthMap.shape[1])
+                m0.vs2.append(vertex_cst)
+        print("矩阵计算时间：",(t.time()-t0)/60,"min")
+
+
         print("render start")
         t0=t.time()
         w=self.opt["w"]#800#257
@@ -66,13 +86,12 @@ class Main:
         for i in range(len(self.meshes)):#range(len(matrices_all)):
             print("rendering",len(self.meshes),i,end="\t\r")
             m0 = self.meshes[i]
-            for matrix in self.matrices_all[i]:
+            for vertex_cst in m0.vs2:
                 Rasterization(
-                    matrix,
+                    vertex_cst,
                     m0,
-                    m,v,p,
                     depthMap,#深度图不断更新
-                    i, idMap #构件标记图不断更新
+                    i,idMap #构件标记图不断更新
                 )
         print("渲染时间：",(t.time()-t0)/60,"min")
         

@@ -1,17 +1,18 @@
 import numpy as np
 import math
 class Rasterization:  
-    def __init__(self,matrix,mesh, m,v,p,depthMap,id,idMap):
+    def __init__(self,vertex_cst,mesh,depthMap,id,idMap):
         self.mesh=mesh
         self.id=id
-        self.CoordinateSystemTransformation(
-            matrix,
-            m,v,p,
-            depthMap.shape[0],depthMap.shape[1]
-            )
-        self.depthMapNew,self.idMapNew=self.getDepthMapNew(depthMap,idMap)
-    def CoordinateSystemTransformation(self,matrix,m,v,p,w,h):
-        mesh=self.mesh
+        # vertex_cst=self.CoordinateSystemTransformation(
+        #     mesh,
+        #     matrix,
+        #     m,v,p,
+        #     depthMap.shape[0],depthMap.shape[1]
+        #     )
+        self.depthMapNew,self.idMapNew=self.getDepthMapNew(vertex_cst,depthMap,idMap)
+    @staticmethod
+    def CoordinateSystemTransformation(mesh,matrix,m,v,p,w,h):
         vertex0=mesh.vertex#getVertexHead()
         vertex0=np.array(vertex0)
         vertex0=np.c_[vertex0,np.ones(vertex0.shape[0])] #c_是column(列)的缩写，就是按列叠加两个矩阵，就是把两个矩阵左右组合，要求行数相等。
@@ -32,12 +33,9 @@ class Rasterization:
         vertex3[:,1]=(vertex3[:,1]/2+0.5)#vertex3[:,1]=(vertex3[:,1]/2+0.5)*(h-1)# -1~1 -> 0~h
         vertex3[:,1]=(h-1)*vertex3[:,1]
         vertex4=vertex3[:,0:2]#-1~1
-        # vertex4=0.5+vertex4/2#0~1
         vertex5=np.c_[vertex4,vertex3[:,2]]#加上深度
-
-        mesh.vertex_cst=vertex5
         return vertex5
-    def getDepthMapNew(self,depthMap,idMap):
+    def getDepthMapNew(self,vertex_cst,depthMap,idMap):
 
         def inScreen(v1,v2,v3,w,h):
             def pointInScreen(v):
@@ -81,7 +79,7 @@ class Rasterization:
         m0=self.mesh
         w=depthMap.shape[0]
         h=depthMap.shape[1]
-        vs=m0.vertex_cst
+        vs=vertex_cst
         test_i=0
         for f in m0.face:#遍历每个三角形
             test_i=test_i+1
