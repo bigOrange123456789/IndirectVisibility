@@ -1,14 +1,61 @@
 #http://www.manongjc.com/detail/51-wybgtxykomkmmta.html
-import math
-from OpenGL.GL import *
 from OpenGL.arrays import vbo
-from OpenGL.GLU import *
+
+from OpenGL.GL import *
 from OpenGL.GLUT import *
-#import OpenGL.GLUT as glut
+from OpenGL.GLU import *
+
+import math
 import numpy as ny
+np=ny  
+
 class common:
      bCreate = False
- 
+#网格的实现
+class Mesh0():
+    def __init__(self,id,V,F):
+        id=0xfffff
+        self.color=np.array([
+            id&0xff0000,
+            id&0x00ff00,
+            id&0x0000ff
+            ])#/255
+        # self.color=[255,255,255]
+        # print(self.color)
+        self.face=F
+        self.vertex=V
+    def draw(self):
+        glBegin(GL_TRIANGLES)#glBegin(GL_QUADS)
+        for surface in self.face:
+            for v_i in surface:
+                glColor3fv(self.color)
+                glVertex3fv(self.vertex[v_i])
+        glEnd()
+class Mesh0(common):
+     def __init__(this,id,V,F):
+        id=0xfffff
+        this.color=np.array([
+            id&0xff0000,
+            id&0x00ff00,
+            id&0x0000ff
+            ])#/255
+        # self.color=[255,255,255]
+        # print(self.color)
+        this.face=F
+        this.vertex=V
+     def createVAO(this):
+        this.vbo = vbo.VBO(ny.array(this.vertex,'f'))
+        this.ebo = vbo.VBO(ny.array(this.face,'H'),target = GL_ELEMENT_ARRAY_BUFFER)
+        this.vboLength = len(this.vertex)
+        this.eboLength = len(this.face)
+        this.bCreate = True
+     def draw(this):
+         if this.bCreate == False:
+             this.createVAO()
+         this.vbo.bind()
+         glInterleavedArrays(GL_V3F,0,None)
+         this.ebo.bind()
+         glDrawElements(GL_TRIANGLES,this.eboLength,GL_UNSIGNED_SHORT,None)   
 #球的实现
 class sphere(common):
     def __init__(this,rigns,segments,radius):
@@ -36,13 +83,6 @@ class sphere(common):
                 vindex.append((y + 1) * this.segments + x + 1)
                 vindex.append((y + 0) * this.segments + x + 1)
                 vindex.append((y + 0) * this.segments + x)
-        #this.vboID = glGenBuffers(1)
-        #glBindBuffer(GL_ARRAY_BUFFER,this.vboID)
-        #glBufferData (GL_ARRAY_BUFFER, len(vdata)*4, vdata, GL_STATIC_DRAW)
-        #this.eboID = glGenBuffers(1)
-        #glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,this.eboID)
-        #glBufferData (GL_ELEMENT_ARRAY_BUFFER, len(vIndex)*4, vIndex,
-        #GL_STATIC_DRAW)
         this.vbo = vbo.VBO(ny.array(vdata,'f'))
         this.ebo = vbo.VBO(ny.array(vindex,'H'),target = GL_ELEMENT_ARRAY_BUFFER)
         this.vboLength = this.segments * this.rigns
@@ -51,21 +91,10 @@ class sphere(common):
     def drawShader(this,vi,ni,ei):
         if this.bCreate == False:
             this.createVAO()
-        #glBindBuffer(GL_ARRAY_BUFFER,this.vboID)
-        #glVertexAttribPointer(vi,3,GL_FLOAT,False,24,0)
-        #glEnableVertexAttribArray(vi)
-        #glVertexAttribPointer(ni,3,GL_FLOAT,False,24,12)
-        #glEnableVertexAttribArray(ni)
-        #glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,this.eboID)
-        #glDrawElements(GL_TRIANGLES,this.eboLength,GL_UNSIGNED_INT,0)
         this.vbo.bind()
     def draw(this):
         if this.bCreate == False:
             this.createVAO()
-        #glBindBuffer(GL_ARRAY_BUFFER,this.vboID)
-        #glInterleavedArrays(GL_N3F_V3F,0,None)
-        #glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,this.eboID)
-        #glDrawElements(GL_TRIANGLES,this.eboLength,GL_UNSIGNED_INT,None)
         this.vbo.bind()
         glInterleavedArrays(GL_N3F_V3F,0,None)
         this.ebo.bind()
@@ -177,16 +206,30 @@ class camera:#摄像机漫游
          this.rotate(rx,ry)
          print(x,y)
          this.mouselocation = [x,y]
-
-if __name__ == '__main__':
- from OpenGL.GL import *
- from OpenGL.GLUT import *
- from OpenGL.GLU import *
- 
-
- import sys
- 
- window = 0
+vertices =(
+    (1,-1,-1),
+    (1,1,-1),
+    (-1,1,-1),
+    (-1,-1,-1),
+    (1,-1,1),
+    (1,1,1),
+    (-1,-1,1),
+    (-1,1,1),
+    )
+surfaces = (
+    (0,1,2,3),
+    (3,2,7,6),
+    (6,7,5,4),
+    (4,5,1,0),
+    (1,5,7,2),
+    (4,0,3,6)
+    )
+if __name__ == '__main__': 
+ m0=Mesh0(
+    0xfffff,
+    vertices,
+    np.array(surfaces)[:,0:2]
+ )
  sph = sphere(16,16,1)#common.sphere(16,16,1)
  camera = camera()#common.camera()
  plane = plane(12,12,1.,1.)#common.plane(12,12,1.,1.)
@@ -227,20 +270,23 @@ if __name__ == '__main__':
      glMatrixMode(GL_MODELVIEW)
      
  def main():
-     global window
-     glutInit(sys.argv)
+     glutInit()
      glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH)
      glutInitWindowSize(640,400)
      glutInitWindowPosition(800,400)
-     window = glutCreateWindow("opengl")
+     glutCreateWindow("opengl")
+
      glutDisplayFunc(DrawGLScene)
      glutIdleFunc(DrawGLScene)
      glutReshapeFunc(ReSizeGLScene)
      glutMouseFunc( mouseButton )
+     
      glutMotionFunc(camera.mouse)
      glutKeyboardFunc(camera.keypress)
      glutSpecialFunc(camera.keypress)
+
      InitGL(640, 480)
+     
      glutMainLoop()
  
  main()

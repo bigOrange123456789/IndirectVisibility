@@ -1,14 +1,16 @@
 #http://www.manongjc.com/detail/51-wybgtxykomkmmta.html
-import math
-from OpenGL.GL import *
 from OpenGL.arrays import vbo
-from OpenGL.GLU import *
+
+from OpenGL.GL import *
 from OpenGL.GLUT import *
-#import OpenGL.GLUT as glut
-import numpy as ny
+from OpenGL.GLU import *
+
+import math
+import numpy as ny 
+
 class common:
      bCreate = False
- 
+
 #球的实现
 class sphere(common):
     def __init__(this,rigns,segments,radius):
@@ -36,13 +38,6 @@ class sphere(common):
                 vindex.append((y + 1) * this.segments + x + 1)
                 vindex.append((y + 0) * this.segments + x + 1)
                 vindex.append((y + 0) * this.segments + x)
-        #this.vboID = glGenBuffers(1)
-        #glBindBuffer(GL_ARRAY_BUFFER,this.vboID)
-        #glBufferData (GL_ARRAY_BUFFER, len(vdata)*4, vdata, GL_STATIC_DRAW)
-        #this.eboID = glGenBuffers(1)
-        #glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,this.eboID)
-        #glBufferData (GL_ELEMENT_ARRAY_BUFFER, len(vIndex)*4, vIndex,
-        #GL_STATIC_DRAW)
         this.vbo = vbo.VBO(ny.array(vdata,'f'))
         this.ebo = vbo.VBO(ny.array(vindex,'H'),target = GL_ELEMENT_ARRAY_BUFFER)
         this.vboLength = this.segments * this.rigns
@@ -51,21 +46,10 @@ class sphere(common):
     def drawShader(this,vi,ni,ei):
         if this.bCreate == False:
             this.createVAO()
-        #glBindBuffer(GL_ARRAY_BUFFER,this.vboID)
-        #glVertexAttribPointer(vi,3,GL_FLOAT,False,24,0)
-        #glEnableVertexAttribArray(vi)
-        #glVertexAttribPointer(ni,3,GL_FLOAT,False,24,12)
-        #glEnableVertexAttribArray(ni)
-        #glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,this.eboID)
-        #glDrawElements(GL_TRIANGLES,this.eboLength,GL_UNSIGNED_INT,0)
         this.vbo.bind()
     def draw(this):
         if this.bCreate == False:
             this.createVAO()
-        #glBindBuffer(GL_ARRAY_BUFFER,this.vboID)
-        #glInterleavedArrays(GL_N3F_V3F,0,None)
-        #glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,this.eboID)
-        #glDrawElements(GL_TRIANGLES,this.eboLength,GL_UNSIGNED_INT,None)
         this.vbo.bind()
         glInterleavedArrays(GL_N3F_V3F,0,None)
         this.ebo.bind()
@@ -178,15 +162,7 @@ class camera:#摄像机漫游
          print(x,y)
          this.mouselocation = [x,y]
 
-if __name__ == '__main__':
- from OpenGL.GL import *
- from OpenGL.GLUT import *
- from OpenGL.GLU import *
- 
-
- import sys
- 
- window = 0
+if __name__ == '__main__': 
  sph = sphere(16,16,1)#common.sphere(16,16,1)
  camera = camera()#common.camera()
  plane = plane(12,12,1.,1.)#common.plane(12,12,1.,1.)
@@ -227,20 +203,23 @@ if __name__ == '__main__':
      glMatrixMode(GL_MODELVIEW)
      
  def main():
-     global window
-     glutInit(sys.argv)
+     glutInit()
      glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH)
      glutInitWindowSize(640,400)
      glutInitWindowPosition(800,400)
-     window = glutCreateWindow("opengl")
+     glutCreateWindow("opengl")
+
      glutDisplayFunc(DrawGLScene)
      glutIdleFunc(DrawGLScene)
      glutReshapeFunc(ReSizeGLScene)
      glutMouseFunc( mouseButton )
+     
      glutMotionFunc(camera.mouse)
      glutKeyboardFunc(camera.keypress)
      glutSpecialFunc(camera.keypress)
+
      InitGL(640, 480)
+     
      glutMainLoop()
  
  main()
