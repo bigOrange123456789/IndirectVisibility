@@ -32,3 +32,31 @@ class Mesh0():
         OpenGL.GL.glInterleavedArrays(OpenGL.GL.GL_V3F,0,None)
         this.ebo.bind()
         OpenGL.GL.glDrawElements(OpenGL.GL.GL_TRIANGLES,this.eboLength,OpenGL.GL.GL_UNSIGNED_SHORT,None)   
+    @staticmethod
+    def parse(image):
+        result={}
+        xm,ym,_=image.shape
+        for i1 in range(xm):
+            for i2 in range(ym):
+                pixel=image[i1][i2] 
+                id=256*256*pixel[0]+256*pixel[1]+pixel[2]
+                if not id==0xffffff:
+                    id=str(id)
+                    if id in result: result[id]=result[id]+1
+                    else:            result[id]=0
+        return result
+    @staticmethod
+    def getMesh0(mesh,matrix,id):
+        matrixInstance=np.array(matrix).reshape(4,4).T
+        vertex0=np.array(mesh.vertex)
+        vertex0=np.c_[vertex0,np.ones(vertex0.shape[0])] #c_是column(列)的缩写，就是按列叠加两个矩阵，就是把两个矩阵左右组合，要求行数相等。
+        vertex0=np.dot(vertex0,matrixInstance)[:,0:3]
+        vertex0=np.dot(
+                np.array(vertex0),
+                np.array([
+                    [1,0,0],
+                    [0,0,-1],
+                    [0,1,0]
+                ])
+            )
+        return Mesh0(id,vertex0,np.array(mesh.face)-1)

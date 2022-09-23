@@ -1,5 +1,6 @@
 from Mesh import Mesh
-from RasterizationG import Rasterization
+from renderLib.RasterizationG import Rasterization
+from renderLib.Mesh0 import Mesh0
 import time as t
 import cv2
 import json
@@ -64,22 +65,10 @@ class Main:
         )
         
     def sampling(self,ras,x,y,z,saveFlag):
-        def parse(image):
-            result={}
-            xm,ym,_=image.shape
-            for i1 in range(xm):
-                for i2 in range(ym):
-                    pixel=image[i1][i2] 
-                    id=256*256*pixel[0]+256*pixel[1]+pixel[2]
-                    if not id==0xffffff:
-                        id=str(id)
-                        if id in result: result[id]=result[id]+1
-                        else:            result[id]=0
-            return result
         images=ras.render(x,y,z)
         visibilityList={}
         for i in images:# cv2.imwrite(str(i)+".png", images[i])# print(images[i])
-            visibilityList[str(i)]=parse(images[i])
+            visibilityList[str(i)]=Mesh0.parse(images[i])
         path=str(x)+","+str(y)+","+str(z)+".json"
         if saveFlag:
             json.dump(
@@ -98,7 +87,7 @@ class Main:
             m0.vs2=[]
             for matrix in self.matrices_all[i]:
                 renderNodes.append(
-                    Rasterization.getMesh0(m0,matrix,i)
+                    Mesh0.getMesh0(m0,matrix,i)
                 )
         print("矩阵计算时间：",(t.time()-t0)/60,"min")
 
@@ -124,10 +113,12 @@ class Main:
                     y=min[1]+i2*step_len[1]
                     z=min[2]+i3*step_len[2]
                     self.sampling(ras,x,y,z,True)
+        # ras.getPanorama(2213.0870081831645,  23, -1888.057576657758)
+        # self.sampling(ras,2213.0870081831645,  23, -1888.057576657758,True)
         print("render start")
         t0=t.time()
 
-        # self.sampling(ras,2213.0870081831645,  23, -1888.057576657758,True)
+        
         print("渲染时间：",(t.time()-t0)/60,"min")
 
 if __name__ == "__main__":#用于测试
