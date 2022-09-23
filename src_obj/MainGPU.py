@@ -48,7 +48,7 @@ class Main:
         t0=t.time()
         numTriangular=0
         self.meshes=[]
-        for i in range(1):#(500):#range(len(matrices_all)):# range(5000):# i in  # 500-244704 ,51684-15250776
+        for i in range(1000):#(1):#range(len(matrices_all)):# range(5000):# i in  # 500-244704 ,51684-15250776
             m0 = Mesh(inpath+'/obj/'+str(i)+'.obj')
             self.meshes.append(m0)
             numTriangular=numTriangular+len(m0.face)*len(matrices_all[i])
