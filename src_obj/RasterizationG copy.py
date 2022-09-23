@@ -4,9 +4,9 @@ from OpenGL.GL import *
 from OpenGL.GLU import *
 from OpenGL.GLUT import *
 from OpenGL.arrays import vbo
+import pygame
 import cv2
 import math
-import pygame
 class Mesh0():
     def __init__(self,id,V,F):
         self.color=np.array([
@@ -81,7 +81,7 @@ class Camera:#摄像机漫游
         this.origin=[x,y,z]
      def rotate(this,z,y):#z偏航角;y俯仰角
          this.zangle,this.yangle = this.zangle - z,this.yangle + y if not this.__bthree else -y
-     def rotationSet(this,z,y):
+     def rotateSet(this,z,y):
         this.zangle,this.yangle = z,y
      def setLookat(this):
          ve,vt = this.eye(),this.target()
@@ -125,6 +125,9 @@ class Rasterization:
             camera.positionSet(2213.0870081831645,  23, -1888.057576657758)
 
         def DrawGLScene():
+            glEnable(GL_TEXTURE_2D)
+            glEnable(GL_DEPTH_TEST)
+            glDepthFunc(GL_LEQUAL)
 
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
             glMatrixMode(GL_MODELVIEW)    
@@ -147,41 +150,20 @@ class Rasterization:
 
         width = 800
         height = 800
-        loop=False#True
-        
-        
-        if loop:
-            glutInit()
-            glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH)
-            glutInitWindowSize(width,height)
-            glutInitWindowPosition(0,0)
-            glutCreateWindow("opengl")
-            InitGL(width, height)
-        else:
-            glutInit()
-            glutCreateWindow("opengl")
-            pygame.display.set_mode((width,height), DOUBLEBUF | OPENGL)
+
+        glutInit()
+        glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH)
+        glutInitWindowSize(width,height)
+        glutInitWindowPosition(0,0)
+        glutCreateWindow("opengl")
+
+        # pygame.display.set_mode((width,height), DOUBLEBUF | OPENGL)
 
         InitGL(width, height)
-        def cut(r,name):
-            camera.rotationSet(r[0],r[1])
-            DrawGLScene()
-            image_buffer = glReadPixels(0, 0, width,height, OpenGL.GL.GL_RGB, OpenGL.GL.GL_UNSIGNED_BYTE)
-            image = np.frombuffer(image_buffer, dtype=np.uint8).reshape(width,height, 3)
-            cv2.imwrite(name, image)# pygame.quit()
-        def getPanorama():
-            rotations=[#z偏航角;y俯仰角
-                [0,0],
-                [math.pi/2,0],
-                [math.pi,0],
-                [3*math.pi/2,0],
-                [0,math.pi/2],
-                [0,1e-10-math.pi/2]
-            ]
-            for i in range(6):
-                cut(rotations[i],str(i)+".png")
-
         
+        # pygame.display.set_mode((width,height), DOUBLEBUF | OPENGL)
+
+        loop=False#True
         if loop:
             glutDisplayFunc(DrawGLScene)
             glutIdleFunc(DrawGLScene)
@@ -195,11 +177,12 @@ class Rasterization:
             glutMainLoop()
         else:
             DrawGLScene()
+            # pygame.time.wait(10000)
 
-            # image_buffer = glReadPixels(0, 0, width,height, OpenGL.GL.GL_RGB, OpenGL.GL.GL_UNSIGNED_BYTE)
-            # image = np.frombuffer(image_buffer, dtype=np.uint8).reshape(width,height, 3)
-            # cv2.imwrite("image.png", image)# pygame.quit()
-            getPanorama()
+            image_buffer = glReadPixels(0, 0, width,height, OpenGL.GL.GL_RGB, OpenGL.GL.GL_UNSIGNED_BYTE)
+            image = np.frombuffer(image_buffer, dtype=np.uint8).reshape(width,height, 3)
+            cv2.imwrite(r"image.png", image)
+            pygame.quit()
 
 
         
