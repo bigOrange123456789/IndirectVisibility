@@ -1,6 +1,8 @@
 from Mesh import Mesh
 from RasterizationG import Rasterization
 import time as t
+import cv2
+import json
 class Main:
     @staticmethod
     def mkdir(path):
@@ -9,7 +11,6 @@ class Main:
             os.makedirs(path) 
     @staticmethod
     def loadJson(path):
-        import json
         return json.load(open(path))
     @staticmethod
     def saveImg(image,name):
@@ -29,9 +30,12 @@ class Main:
                 os.rmdir(os.path.join(root, name)) # 删除一个空目录
     def __init__(self,opt):
         self.opt=opt
-        inpath=opt["inpath"]
+        self.inpath=opt["inpath"]
+        self.outpath=opt["outpath"]
+        self.mkdir(self.outpath)
+        self.remove(self.outpath)
 
-        matrices_all=self.loadJson(inpath+'/matrices_all.json')
+        matrices_all=self.loadJson(self.inpath+'/matrices_all.json')
         for e in matrices_all:
             e.append([1,0,0,0, 0,1,0,0, 0,0,1,0])
         for e in matrices_all:
@@ -47,22 +51,49 @@ class Main:
         numTriangular=0
         self.meshes=[]
         for i in range(100):#range(len(matrices_all)):#(1):# range(5000):# i in  # 500-244704 ,51684-15250776
-            m0 = Mesh(inpath+'/obj/'+str(i)+'.obj')
+            m0 = Mesh(self.inpath+'/obj/'+str(i)+'.obj')
             self.meshes.append(m0)
             numTriangular=numTriangular+len(m0.face)*len(matrices_all[i])
-            print("loading",len(matrices_all),i,end="\t\r")
-        print("加载时间：",(t.time()-t0)/60,"min\t\t\t")
-        print("三角面片总个数：",numTriangular)
+            print("loading", len(matrices_all) , i , end="\t\r" )
+        print("加载时间：", (t.time()-t0)/60, "min\t\t\t" )
+        print("三角面片总个数：", numTriangular )
+        self.render(
+            config["max"],
+            config["min"],
+            config["step"]
+        )
         
-    def render(self,m,v,p):
+    def sampling(self,ras,x,y,z,saveFlag):
+        def parse(image):
+            result={}
+            xm,ym,_=image.shape
+            for i1 in range(xm):
+                for i2 in range(ym):
+                    pixel=image[i1][i2] 
+                    id=256*256*pixel[0]+256*pixel[1]+pixel[2]
+                    if not id==0xffffff:
+                        id=str(id)
+                        if id in result: result[id]=result[id]+1
+                        else:            result[id]=0
+            return result
+        images=ras.render(x,y,z)
+        visibilityList={}
+        for i in images:# cv2.imwrite(str(i)+".png", images[i])# print(images[i])
+            visibilityList[str(i)]=parse(images[i])
+        path=str(x)+","+str(y)+","+str(z)+".json"
+        if saveFlag:
+            json.dump(
+                visibilityList,
+                open(self.outpath+"/"+path,"w")
+            )
+        return visibilityList
+
+    def render(self,max,min,step_num):
         print("矩阵计算 start")
         t0=t.time()
-        w=self.opt["w"]#800#257
-        h=self.opt["h"]#800#257
-
         renderNodes=[]
         for i in range(len(self.meshes)):#range(len(matrices_all)):
-            print("rendering",len(self.meshes),i,end="\t\r")
+            print("矩阵计算",len(self.meshes),i,end="\t\r")
             m0 = self.meshes[i]
             m0.vs2=[]
             for matrix in self.matrices_all[i]:
@@ -71,37 +102,33 @@ class Main:
                 )
         print("矩阵计算时间：",(t.time()-t0)/60,"min")
 
-
+        print("初始化渲染器")
+        t0=t.time()
+        ras=Rasterization({
+            "renderNodes":renderNodes,
+            "width":self.opt["w"],
+            "height":self.opt["h"],
+            "loop":  False # True #
+        })
+        print("初始化渲染器的时间:",(t.time()-t0)/60,"min")
+        step_len=[
+            (max[0]-min[0])/step_num[0],
+            (max[1]-min[1])/step_num[1],
+            (max[2]-min[2])/step_num[2],
+        ]
+        print("step_len",step_len)
+        for i1 in range(1+step_num[0]):
+            for i2 in range(1+step_num[1]):
+                for i3 in range(1+step_num[2]):
+                    x=min[0]+i1*step_len[0]
+                    y=min[1]+i2*step_len[1]
+                    z=min[2]+i3*step_len[2]
+                    self.sampling(ras,x,y,z,True)
         print("render start")
         t0=t.time()
-        w=self.opt["w"]#800#257
-        h=self.opt["h"]#800#257
-        Rasterization(
-            renderNodes,v
-        )
+
+        # self.sampling(ras,2213.0870081831645,  23, -1888.057576657758,True)
         print("渲染时间：",(t.time()-t0)/60,"min")
-        
-        # outpath=self.opt["outpath"]
-        # self.mkdir(outpath)
-        # self.remove(outpath)
-
-        # image=np.ones([w,h,3])
-        # for i in range(w):
-        #     for j in range(h):
-        #         c=depthMap[j][i]
-        #         image[i][j][0]=c
-        #         image[i][j][1]=c
-        #         image[i][j][2]=c
-        # self.saveImg(image,outpath+"/depthMap.jpg")
-
-        # for i in range(w):
-        #     for j in range(h):
-        #         c=int(idMap[j][i])
-        #         if c<0:c=0xffffff
-        #         image[i][j][0]=c&0xff0000
-        #         image[i][j][1]=c&0x00ff00
-        #         image[i][j][2]=c&0x0000ff
-        # self.saveImg(image,outpath+"/idMap.jpg")
 
 if __name__ == "__main__":#用于测试
     import sys
@@ -110,6 +137,4 @@ if __name__ == "__main__":#用于测试
         exit(0)
     path=sys.argv[1]
     config=Main.loadJson(path)
-    Main(config).render(
-        config["m"],config["v"],config["p"]
-    )
+    Main(config)

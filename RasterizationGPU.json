@@ -1,0 +1,22 @@
+{
+    "inpath":"E:/gitHubRepositories/SoftRasterization/huayi133",
+    "outpath":"E:\\gitHubRepositories\\IndirectVisibility\\out_img",
+    "w":800,
+    "h":800,
+    
+    "min": [
+		2154,
+		0,
+		-1918
+	],
+	"max": [
+		2260,
+		54,
+		-1842
+	],
+	"step": [
+		53,
+		27,
+		38
+	]
+}

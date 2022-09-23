@@ -62,9 +62,9 @@ class Camera:#摄像机漫游
              this.move(0.,-1 * this.offest,0.)
          if key in (b'v', b'V'):#this.__bthree = not this.__bthree
              this.setthree(not this.__bthree)
-         if key == OpenGL.GL.GLUT_KEY_UP:
+         if key == OpenGL.GLUT.GLUT_KEY_UP:
              this.offest = this.offest + 0.1
-         if key == OpenGL.GL.GLUT_KEY_DOWN:
+         if key == OpenGL.GLUT.GLUT_KEY_DOWN:
              this.offest = this.offest - 0.1
      def mouse(this,x,y):  
          rx = (x - this.mouselocation[0]) * this.offest * 0.1
