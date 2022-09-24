@@ -153,6 +153,8 @@ if __name__ == "__main__":#用于测试
   config=Tool.loadJson(path)
   if "in" in config:
     config["in"]=config["result_path"]
+  if "analysis" in config and not config["analysis"]:
+    exit(0)
   iv=Main(config)
   iv.remove(iv.outPath)
   iv.start()

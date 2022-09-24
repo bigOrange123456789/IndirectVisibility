@@ -33,6 +33,8 @@ class Main:
         self.opt=opt
         self.inpath=opt["inpath"]
         self.outpath=opt["result_path"]
+        self.startPosition=("startPosition" in opt) and opt["startPosition"] or 0
+        self.endPosition=("endPosition" in opt) and opt["endPosition"] or 1
         self.mkdir(self.outpath)
         if opt["result_path_remove"]:
             self.remove(self.outpath)
@@ -52,7 +54,7 @@ class Main:
         t0=t.time()
         numTriangular=0
         self.meshes=[]
-        for i in range(len(matrices_all)):#range(500):#(1):# range(5000):# i in  # 500-244704 ,51684-15250776
+        for i in range(500):#range(len(matrices_all)):#(1):# range(5000):# i in  # 500-244704 ,51684-15250776
             m0 = Mesh(self.inpath+'/obj/'+str(i)+'.obj')
             self.meshes.append(m0)
             numTriangular=numTriangular+len(m0.face)*len(matrices_all[i])
@@ -128,11 +130,13 @@ class Main:
             for i2 in range(1+step_num[1]):
                 for i3 in range(1+step_num[2]):
                     number=i1*(1+step_num[1])*(1+step_num[2])+i2*(1+step_num[2])+i3
-                    print("视点总数:",number_all,";当前视点编号:",number,";处理进度:",number/number_all,"\t\t\t",end="\r")      
-                    x=min[0]+i1*step_len[0]
-                    y=min[1]+i2*step_len[1]
-                    z=min[2]+i3*step_len[2]
-                    self.sampling(ras,x,y,z,True)
+                    percent=number/number_all
+                    print("视点总数:",number_all,";当前视点编号:",number,";处理进度:",percent,"\t\t\t",end="\r")
+                    if percent>=self.startPosition and percent<=self.endPosition:      
+                        x=min[0]+i1*step_len[0]
+                        y=min[1]+i2*step_len[1]
+                        z=min[2]+i3*step_len[2]
+                        self.sampling(ras,x,y,z,True)
                     # print("\n 采样时间：",t.time()-t0,"s")
                     # exit(0)
         # ras.getPanorama(2213.0870081831645,  23, -1888.057576657758)

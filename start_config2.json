@@ -34,5 +34,8 @@
     "out2.d0":"",
     "out2.nameList":"",
 
-    "outPath":"out"
+    "outPath":"out",
+    "startPosition":0,
+    "endPosition":1,
+    "analysis":false
 }
