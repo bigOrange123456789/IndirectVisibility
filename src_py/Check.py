@@ -43,6 +43,7 @@ class Check:
   def check(self,config):
     step=config["step"]
     flag_nopath=False
+    # print("step",step)
     for i1 in range(step[0]+1):
         print(i1,"\t",step[0]+1,end="\r")
         for i2 in range(step[1]+1):

@@ -1,7 +1,7 @@
 {
     "inpath":"E:/gitHubRepositories/SoftRasterization/huayi133",
-    "outpath":"out_img",
-	"outpath_old":"E:\\gitHubRepositories\\IndirectVisibility\\out_img",
+    "result_path":"result_directVisibility",
+	"result_path_remove":false,
     "w":800,
     "h":800,
     
@@ -15,7 +15,7 @@
 		54,
 		-1842
 	],
-	"step": [
+	"step_num": [
 		53,
 		27,
 		38

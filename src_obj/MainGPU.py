@@ -3,6 +3,7 @@ from renderLib.RasterizationG import Rasterization
 from renderLib.Mesh0 import Mesh0
 import time as t
 import json
+import math
 class Main:
     @staticmethod
     def mkdir(path):
@@ -31,9 +32,10 @@ class Main:
     def __init__(self,opt):
         self.opt=opt
         self.inpath=opt["inpath"]
-        self.outpath=opt["outpath"]
+        self.outpath=opt["result_path"]
         self.mkdir(self.outpath)
-        self.remove(self.outpath)
+        if opt["result_path_remove"]:
+            self.remove(self.outpath)
 
         matrices_all=self.loadJson(self.inpath+'/matrices_all.json')
         for e in matrices_all:
@@ -54,13 +56,13 @@ class Main:
             m0 = Mesh(self.inpath+'/obj/'+str(i)+'.obj')
             self.meshes.append(m0)
             numTriangular=numTriangular+len(m0.face)*len(matrices_all[i])
-            print("loading", len(matrices_all) , i , end="\t\r" )
+            print("\t\t加载进度:", i,"/",len(matrices_all)  , end="\t\r" )
         print("加载时间：", (t.time()-t0)/60, "min\t\t\t" )
         print("三角面片总个数：", numTriangular )
         self.render(
             config["max"],
             config["min"],
-            config["step"]
+            config["step_num"]
         )
         
     def sampling(self,ras,x,y,z,saveFlag):
@@ -72,7 +74,10 @@ class Main:
         # t00=t.time()
         visibilityList={}
         for i in images:# cv2.imwrite(str(i)+".png", images[i])# print(images[i])
-            visibilityList[str(i)]=Mesh0.parse(images[i])
+            visibilityList[str(i+1)]=Mesh0.parse(images[i])
+        if math.floor(x)==x:x=int(x)
+        if math.floor(y)==y:y=int(y)
+        if math.floor(z)==z:z=int(z)
         path=str(x)+","+str(y)+","+str(z)+".json"
         # print("解析时间：",t.time()-t00)
 
@@ -133,12 +138,23 @@ class Main:
         # ras.getPanorama(2213.0870081831645,  23, -1888.057576657758)
         # self.sampling(ras,2213.0870081831645,  23, -1888.057576657758,True)
         print("\n 采样时间：",(t.time()-t0)/60,"min")
+        self.samplingTime=(t.time()-t0)/60
+
+        
 
 if __name__ == "__main__":#用于测试
     import sys
     if len(sys.argv)<2:
         print("ERR:请指定config.json的路径")
         exit(0)
+    import os
+    os.system('cls') #清空Python控制台
     path=sys.argv[1]
     config=Main.loadJson(path)
-    Main(config)
+    main0=Main(config)
+    config["samplingTime"]=main0.samplingTime
+    config["step"]=config["step_num"]
+    json.dump(
+        config,
+        open(config["result_path"]+"/config.json","w")
+    )

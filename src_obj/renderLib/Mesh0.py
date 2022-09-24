@@ -50,7 +50,7 @@ class Mesh0():
         #             else:            result[id]=1
         
         for k in np.unique(image):
-            if not id==0xffffff:
+            if not k==0xffffff:
                 result[str(k)] = image[ image == k ].size
 
         return result

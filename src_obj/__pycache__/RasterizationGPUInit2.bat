@@ -4,3 +4,6 @@ pip install PyOpenGL-3.1.6-cp310-cp310-win_amd64.whl
 pip install numpy
 pip install opencv-python
 pip install pygame
+
+
+pip install numba
