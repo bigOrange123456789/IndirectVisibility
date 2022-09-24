@@ -123,7 +123,7 @@ class Main:
         ]
         print("step_len",step_len)
         
-        print("开始采样")
+        print("开始采样","start:",self.startPosition,";end:",self.endPosition,";")
         t0=t.time()
         number_all=(1+step_num[0])*(1+step_num[1])*(1+step_num[2])
         for i1 in range(1+step_num[0]):
