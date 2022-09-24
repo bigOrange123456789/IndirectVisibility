@@ -11,10 +11,9 @@ from pygame.locals import *
 from renderLib.Camara import Camera
 class Rasterization:  
     def loop(self):
-        camera=self.camera
         def mouseButton( button, mode, x, y ):    
             if button == GLUT_RIGHT_BUTTON:
-                camera.mouselocation = [x,y]
+                self.camera.mouselocation = [x,y]
         def ReSizeGLScene(Width, Height): 
             glViewport(0, 0, Width, Height)        
             glMatrixMode(GL_PROJECTION)
@@ -25,18 +24,17 @@ class Rasterization:
         glutIdleFunc(self.DrawGLScene)
         # glutReshapeFunc(ReSizeGLScene)
         glutMouseFunc( mouseButton )
-        glutMotionFunc(camera.mouse)
-        glutKeyboardFunc(camera.keypress)
-        glutSpecialFunc(camera.keypress)
+        glutMotionFunc(self.camera.mouse)
+        glutKeyboardFunc(self.camera.keypress)
+        glutSpecialFunc(self.camera.keypress)
         glutMainLoop()
     def DrawGLScene(self):
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
         glMatrixMode(GL_MODELVIEW)    
         self.camera.setLookat()
         for m in self.renderNodes:
-            m.draw()                   
-        glutSwapBuffers()
-        
+            m.draw()       
+        return  
     def __init__(self,opt):
         self.renderNodes=opt["renderNodes"]
         loop=opt["loop"]  #  False  #  True  #  
@@ -44,7 +42,6 @@ class Rasterization:
         height=opt["height"]
         self.width=width
         self.height=height
-
         self.camera = Camera()
         # self.camera.positionSet(2213.0870081831645,  23, -1888.057576657758)
 
@@ -62,18 +59,25 @@ class Rasterization:
             glutInitWindowPosition(0,0)
             glutCreateWindow("opengl")
             InitGL(width, height)
+        # else:
+        #     # os.environ['SDL_VIDEO_WINDOW_POS']="%d,%d"%(-1000,-1000)
+        #     glutInit()
+        #     glutCreateWindow("lzc test1")
+        #     # glutInitWindowSize(1,1)
+        #     # glutInitWindowPosition(-1000,-1000)
+        #     os.environ['SDL_VIDEO_WINDOW_POS']="%d,%d"%(-1000,-1000)
+        #     icon=pygame.image.load("icon.png")
+        #     pygame.display.set_icon(icon)
+        #     pygame.display.set_mode((width,height), DOUBLEBUF | OPENGL)
+        #     pygame.display.set_caption("lzc test2")
+        #     InitGL(width, height)
         else:
-            # os.environ['SDL_VIDEO_WINDOW_POS']="%d,%d"%(-1000,-1000)
-            glutInit()
-            glutCreateWindow("lzc test1")
-            # glutInitWindowSize(1,1)
-            # glutInitWindowPosition(-1000,-1000)
+            pygame.init()
             os.environ['SDL_VIDEO_WINDOW_POS']="%d,%d"%(-1000,-1000)
             icon=pygame.image.load("icon.png")
             pygame.display.set_icon(icon)
             pygame.display.set_mode((width,height), DOUBLEBUF | OPENGL)
             pygame.display.set_caption("lzc test2")
-
             InitGL(width, height)
         
         if loop:

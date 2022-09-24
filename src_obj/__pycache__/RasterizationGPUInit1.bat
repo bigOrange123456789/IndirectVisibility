@@ -1,0 +1,1 @@
+conda create -n myOpenGL2 python=3.10.0

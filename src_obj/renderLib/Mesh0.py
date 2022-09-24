@@ -35,15 +35,24 @@ class Mesh0():
     @staticmethod
     def parse(image):
         result={}
-        xm,ym,_=image.shape
-        for i1 in range(xm):
-            for i2 in range(ym):
-                pixel=image[i1][i2] 
-                id=256*256*pixel[0]+256*pixel[1]+pixel[2]
-                if not id==0xffffff:
-                    id=str(id)
-                    if id in result: result[id]=result[id]+1
-                    else:            result[id]=0
+        
+        image=256*256*image[:,:,0]+256*image[:,:,1]+image[:,:,2]
+
+        # xm,ym,_=image.shape
+        # for i1 in range(xm):
+        #     for i2 in range(ym):
+        #         # pixel=image[i1][i2] 
+        #         # id=256*256*pixel[0]+256*pixel[1]+pixel[2]
+        #         id=image[i1][i2] 
+        #         if not id==0xffffff:
+        #             id=str(id)
+        #             if id in result: result[id]=result[id]+1
+        #             else:            result[id]=1
+        
+        for k in np.unique(image):
+            if not id==0xffffff:
+                result[str(k)] = image[ image == k ].size
+
         return result
     @staticmethod
     def getMesh0(mesh,matrix,id):
