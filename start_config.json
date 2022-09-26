@@ -37,5 +37,5 @@
     "outPath":"out",
     "startPosition":0,
     "endPosition":1,
-    "analysis":true
+    "analysis":false
 }

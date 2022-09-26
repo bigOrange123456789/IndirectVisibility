@@ -54,7 +54,7 @@ class Main:
         t0=t.time()
         numTriangular=0
         self.meshes=[]
-        for i in range(500):#range(len(matrices_all)):#(1):# range(5000):# i in  # 500-244704 ,51684-15250776
+        for i in range(len(matrices_all)):#range(500):#(1):# range(5000):# i in  # 500-244704 ,51684-15250776
             m0 = Mesh(self.inpath+'/obj/'+str(i)+'.obj')
             self.meshes.append(m0)
             numTriangular=numTriangular+len(m0.face)*len(matrices_all[i])
@@ -157,7 +157,9 @@ if __name__ == "__main__":#用于测试
     config=Main.loadJson(path)
     main0=Main(config)
     config["samplingTime"]=main0.samplingTime
+    config["predict_AllTime"]=main0.samplingTime/(config["endPosition"]-config["startPosition"])
     config["step"]=config["step_num"]
+    print("predict_AllTime",config["predict_AllTime"])
     json.dump(
         config,
         open(config["result_path"]+"/config.json","w")
