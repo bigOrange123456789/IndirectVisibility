@@ -151,7 +151,7 @@ if __name__ == "__main__":#用于测试
     exit(0)
   path=sys.argv[1]
   config=Tool.loadJson(path)
-  if "in" in config:
+  if "result_path" in config:
     config["in"]=config["result_path"]
   if "analysis" in config and not config["analysis"]:
     exit(0)

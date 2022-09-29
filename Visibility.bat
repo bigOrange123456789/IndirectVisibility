@@ -8,7 +8,7 @@ exit
 
 :B
 call activate base
-python ./src_py/main.py "%1"
+python ./b_analysis/main.py "%1"
 echo End all
 pause
 exit

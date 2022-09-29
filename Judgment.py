@@ -1,5 +1,5 @@
 import sys
-sys.path.append("src_py")
+sys.path.append("b_analysis")
 from Main import Main as IndirectVisibility
 class Judgment:
     def __init__(self):

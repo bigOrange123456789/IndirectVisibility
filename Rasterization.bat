@@ -8,7 +8,7 @@ exit
 
 :B
 call activate base
-python ./src_obj/main.py "%1"
+python ./a_sampling/main.py "%1"
 echo End all
 pause
 exit

@@ -8,8 +8,8 @@ exit
 
 :B
 call activate myOpenGL2
-python ./src_obj/mainGPU.py "%1"
-python ./src_py/main.py "%1"
+python ./a_sampling/mainGPU.py "%1"
+python ./b_analysis/main.py "%1"
 echo End all
 pause
 exit
