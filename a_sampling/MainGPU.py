@@ -54,7 +54,7 @@ class Main:
         t0=t.time()
         numTriangular=0
         self.meshes=[]
-        for i in range(len(matrices_all)):#range(500):#(1):# range(5000):# i in  # 500-244704 ,51684-15250776
+        for i in range(2000):#range(len(matrices_all)):#(1):# range(5000):# i in  # 500-244704 ,51684-15250776
             m0 = Mesh(self.inpath+'/obj/'+str(i)+'.obj')
             self.meshes.append(m0)
             numTriangular=numTriangular+len(m0.face)*len(matrices_all[i])
@@ -125,20 +125,28 @@ class Main:
         
         print("开始采样","start:",self.startPosition,";end:",self.endPosition,";")
         t0=t.time()
-        number_all=(1+step_num[0])*(1+step_num[1])*(1+step_num[2])
-        for i1 in range(1+step_num[0]):
-            for i2 in range(1+step_num[1]):
-                for i3 in range(1+step_num[2]):
-                    number=i1*(1+step_num[1])*(1+step_num[2])+i2*(1+step_num[2])+i3
-                    percent=number/number_all
-                    print("视点总数:",number_all,";当前视点编号:",number,";处理进度:",percent,"\t\t\t",end="\r")
-                    if percent>=self.startPosition and percent<=self.endPosition:      
-                        x=min[0]+i1*step_len[0]
-                        y=min[1]+i2*step_len[1]
-                        z=min[2]+i3*step_len[2]
-                        self.sampling(ras,x,y,z,True)
-                    # print("\n 采样时间：",t.time()-t0,"s")
-                    # exit(0)
+        if "onlyPanorama" in self.opt  and self.opt["onlyPanorama"]:
+            i1=int((1+step_num[0])/2)
+            i2=int((1+step_num[1])/2)
+            i3=int((1+step_num[2])/2)
+            x=min[0]+i1*step_len[0]
+            y=min[1]+i2*step_len[1]
+            z=min[2]+i3*step_len[2]
+            print("采样位置",x,y,z)
+            ras.getPanorama(x,y,z)
+        else:
+            number_all=(1+step_num[0])*(1+step_num[1])*(1+step_num[2])
+            for i1 in range(1+step_num[0]):
+                for i2 in range(1+step_num[1]):
+                    for i3 in range(1+step_num[2]):
+                        number=i1*(1+step_num[1])*(1+step_num[2])+i2*(1+step_num[2])+i3
+                        percent=number/number_all
+                        print("视点总数:",number_all,";当前视点编号:",number,";处理进度:",percent,"\t\t\t",end="\r")
+                        if percent>=self.startPosition and percent<=self.endPosition:      
+                            x=min[0]+i1*step_len[0]
+                            y=min[1]+i2*step_len[1]
+                            z=min[2]+i3*step_len[2]
+                            self.sampling(ras,x,y,z,True)
         # ras.getPanorama(2213.0870081831645,  23, -1888.057576657758)
         # self.sampling(ras,2213.0870081831645,  23, -1888.057576657758,True)
         print("\n 采样时间：",(t.time()-t0)/60,"min")

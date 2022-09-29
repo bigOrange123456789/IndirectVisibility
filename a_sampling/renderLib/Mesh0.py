@@ -31,7 +31,10 @@ class Mesh0():
         this.vbo.bind()
         OpenGL.GL.glInterleavedArrays(OpenGL.GL.GL_V3F,0,None)
         this.ebo.bind()
+        # OpenGL.GL.glFrontFace(OpenGL.GL.GL_CW) # GL_CCW（逆时针）或 GL_CW（顺时针）为正向
+        OpenGL.GL.glCullFace(OpenGL.GL.GL_FRONT)    # 背面透明 GL_FRONT GL_FRONT_AND_BACK
         OpenGL.GL.glDrawElements(OpenGL.GL.GL_TRIANGLES,this.eboLength,OpenGL.GL.GL_UNSIGNED_SHORT,None)   
+        #void     glDrawElementsInstanced(GLenum mode, GLsizei count, GLenum type, void* indices, GLsizei primcount )
     @staticmethod
     def parse(image):
         result={}
