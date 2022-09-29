@@ -1,5 +1,20 @@
 import numpy as np
 import OpenGL
+def getVF(mesh,matrix):
+    matrixInstance=np.array(matrix).reshape(4,4).T
+    vertex0=np.array(mesh.vertex)
+    vertex0=np.c_[vertex0,np.ones(vertex0.shape[0])] #c_是column(列)的缩写，就是按列叠加两个矩阵，就是把两个矩阵左右组合，要求行数相等。
+    vertex0=np.dot(vertex0,matrixInstance)[:,0:3]
+    vertex0=np.dot(
+        np.array(vertex0),
+        np.array([
+                [1,0,0],
+                [0,0,-1],
+                [0,1,0]
+            ])
+        )
+    face0=np.array(mesh.face)-1
+    return vertex0,face0
 class Mesh0():
     def __init__(self,id,V,F):
         def srgb_to_linsrgb (srgb):
@@ -59,38 +74,33 @@ class Mesh0():
         return result
     @staticmethod
     def getMesh0(mesh,matrix,id):
-        matrixInstance=np.array(matrix).reshape(4,4).T
-        vertex0=np.array(mesh.vertex)
-        vertex0=np.c_[vertex0,np.ones(vertex0.shape[0])] #c_是column(列)的缩写，就是按列叠加两个矩阵，就是把两个矩阵左右组合，要求行数相等。
-        vertex0=np.dot(vertex0,matrixInstance)[:,0:3]
-        vertex0=np.dot(
-                np.array(vertex0),
-                np.array([
-                    [1,0,0],
-                    [0,0,-1],
-                    [0,1,0]
-                ])
-            )
-        return Mesh0(id,vertex0,np.array(mesh.face)-1)
+        v,f=getVF(mesh,matrix)
+        return Mesh0(id,v,f)
     @staticmethod
     def getInstancedMesh(mesh,matrices,id):
         vertex_all=np.array([])
         face_all=np.array([])
         for matrix in matrices:
-            matrixInstance=np.array(matrix).reshape(4,4).T
-            vertex0=np.array(mesh.vertex)
-            vertex0=np.c_[vertex0,np.ones(vertex0.shape[0])] #c_是column(列)的缩写，就是按列叠加两个矩阵，就是把两个矩阵左右组合，要求行数相等。
-            vertex0=np.dot(vertex0,matrixInstance)[:,0:3]
-            vertex0=np.dot(
-                np.array(vertex0),
-                np.array([
-                    [1,0,0],
-                    [0,0,-1],
-                    [0,1,0]
-                ])
-            )
+            vertex0,face0=getVF(mesh,matrix)
 
-            face0=np.array(mesh.face)-1
+            start_pos=vertex_all.shape[0]
+            face0=face0+start_pos
+            
+            if start_pos==0:
+                vertex_all=vertex0
+                face_all=face0
+            else:
+                vertex_all=np.vstack([vertex_all,vertex0])
+                face_all=np.vstack([face_all,face0])
+
+        return Mesh0(id,vertex_all,face_all)
+    @staticmethod
+    def getBigMesh(mesh,matrices,id):
+        vertex_all=np.array([])
+        face_all=np.array([])
+        for matrix in matrices:
+            vertex0,face0=getVF(mesh,matrix)
+            
             start_pos=vertex_all.shape[0]
             face0=face0+start_pos
             
