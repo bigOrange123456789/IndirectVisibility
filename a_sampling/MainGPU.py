@@ -97,14 +97,23 @@ class Main:
         print("矩阵计算 start")
         t0=t.time()
         renderNodes=[]
+        mesh_type="InstancedMesh"
         for i in range(len(self.meshes)):#range(len(matrices_all)):
             print("矩阵计算",len(self.meshes),i,end="\t\r")
             m0 = self.meshes[i]
-            m0.vs2=[]
-            for matrix in self.matrices_all[i]:
+            m0.vs2=[]#GPU渲染中这个对象没有被使用
+            if mesh_type=="mesh0":
+                matrices=self.matrices_all[i]
                 renderNodes.append(
-                    Mesh0.getMesh0(m0,matrix,i)
+                    Mesh0.getInstancedMesh(m0,matrices,i)
                 )
+            else:
+                for matrix in self.matrices_all[i]:
+                    renderNodes.append(
+                        Mesh0.getMesh0(m0,matrix,i)
+                    )
+
+        print("渲染对象数量:",len(renderNodes))
         print("矩阵计算时间：",(t.time()-t0)/60,"min")
 
         print("初始化渲染器")
