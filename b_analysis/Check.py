@@ -8,14 +8,15 @@ class Check:
     self.jsonPathErr=[]
     config=self.getJson(self.opt["in"]+"/config.json")
     self.check(config)
-  def getJson(self,path):
+  @staticmethod
+  def getJson(path):
     try:
         return json.load(
             open(path,"r")
         )
     except Exception as e:
         print("无法解析的json文件:",path,e)
-        self.jsonPathErr.append(path)#exit(0)
+        # self.jsonPathErr.append(path)#exit(0)
   def isNull(self,path):
     if os.path.getsize(path)==0:
         self.jsonPathErr.append(path)#exit(0)

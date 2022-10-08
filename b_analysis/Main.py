@@ -70,6 +70,7 @@ class Main:
       s,t4=SimMat(self.opt,e).result#SimMat().getSimMat(e)#self.getSimMat(e)#
       print('5.间接可见度')
       d1,t5=Mul(self.opt,d0,s).result
+      
     print('6.计算资源加载列表')
     ls,ls1,ls2,nameList,t6=Lists(self.opt,d0,d1,redunList,nameList).result
     ls1_arr,ls1_index=List2Arr(self.opt,ls1,nameList).result
@@ -90,9 +91,10 @@ class Main:
 
     if "sim_super" in self.opt and self.opt["sim_super"]:#对处理过程超级简化
       list_all=Loader.loadingSim(self.opt)
+      opt_config=Check.getJson(self.opt["in"]+"/config.json")
       for direct in list_all:
         self.optSet(self.outPath+"/out"+direct)#修改存储路径
-        list_arr,list_index=List2Arr.process(self.opt,list_all[direct])
+        list_arr,list_index=List2Arr.process(opt_config,list_all[direct])
         Tool.saveJson(self.opt["out7_d_arr"]+".json",list_arr)
         Tool.saveJson(self.opt["out7_d_index"]+".json",list_index)
       return
@@ -104,14 +106,11 @@ class Main:
       nameList0,d0_=CentralVisibility(self.opt,nameList0_old,d0_).result#如果在多方向采样且不用去除冗余构件的情况下这里不用执行
     print("2.去除冗余(构件)")
     d0_,groups_arr=ClusteringComponent(d0_,self.opt).result
-    print("d0_",d0_)
     #如果是多方向采样下面的计算过程中不需要d0_ #print(groups_arr)
     if self.opt["multidirectionalSampling"]:
       self.opt0["out.config2"]=self.opt["out.config2"]#config2的存储位置不变
-      for direct in range(6):
-        direct=str(direct+1)
+      for direct in loader.dataSplit:
         print("[direct "+direct+"]")
-        loader.loadingSingleDirection(direct)
         data0=loader.dataSplit[direct]#某个方向上的数据
         d0_=loader.directSplit(data0,groups_arr)#每个方向单独计算直接可见度
         nameList0,d0_=CentralVisibility(self.opt,nameList0_old,d0_).result#[nameList0,d0_]似乎是残缺的
