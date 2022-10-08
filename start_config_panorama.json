@@ -34,9 +34,11 @@
     "out2.d0":"",
     "out2.nameList":"",
 
-    "outPath":"out",
+    "outPath":"out2",
     "startPosition":0,
     "endPosition":1,
     "analysis":false,
-    "onlyPanorama":true
+    "onlyPanorama":true,
+
+    "posPanorama":[2154,0,-1918]
 }

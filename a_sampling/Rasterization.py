@@ -26,17 +26,16 @@ class Rasterization:
         vertex2=np.dot(vertex1,viewMat)
         vertex3=np.dot(vertex2,projectMat)
 
-        vertex3[:,0]=vertex3[:,0]/vertex3[:,3]#-1~1#除以第四维的原因？
-        vertex3[:,0]=(vertex3[:,0]/2+0.5)#vertex3[:,0]=(vertex3[:,0]/2+0.5)*(w-1)# -1~1 -> 0~w
+        vertex3[:,0]=vertex3[:,0]/vertex3[:,3]  #-1~1#除以第四维的原因？
+        vertex3[:,0]=(vertex3[:,0]/2+0.5) #vertex3[:,0]=(vertex3[:,0]/2+0.5)*(w-1)# -1~1 -> 0~w
         vertex3[:,0]=(w-1)*vertex3[:,0]
-        vertex3[:,1]=-1*vertex3[:,1]/vertex3[:,3]#-1~1
-        vertex3[:,1]=(vertex3[:,1]/2+0.5)#vertex3[:,1]=(vertex3[:,1]/2+0.5)*(h-1)# -1~1 -> 0~h
+        vertex3[:,1]=-1*vertex3[:,1]/vertex3[:,3]   #-1~1
+        vertex3[:,1]=(vertex3[:,1]/2+0.5)   #vertex3[:,1]=(vertex3[:,1]/2+0.5)*(h-1)# -1~1 -> 0~h
         vertex3[:,1]=(h-1)*vertex3[:,1]
-        vertex4=vertex3[:,0:2]#-1~1
-        vertex5=np.c_[vertex4,vertex3[:,2]]#加上深度
+        vertex4=vertex3[:,0:2]  #-1~1
+        vertex5=np.c_[vertex4,vertex3[:,2]] #加上深度
         return vertex5
     def getDepthMapNew(self,vertex_cst,depthMap,idMap):
-
         def inScreen(v1,v2,v3,w,h):
             def pointInScreen(v):
                 return 0<=v[0] and v[0]<=w-1 and 0<=v[1] and v[1]<=h-1 and 0<=v[2]
@@ -71,8 +70,7 @@ class Rasterization:
                 )
         def updateDepthMap(depthMap,i,j,k1,k2,k3,d1,d2,d3,idMap):
             if 0<=k1 and k1<=1 and 0<=k2 and k2<=1 and 0<=k3 and k3<=1:#像素在三角形内
-                d=k1*d1+k2*d2+k3*d3
-                # print("像素在三角形内",i,j,d)
+                d=k1*d1+k2*d2+k3*d3 # print("像素在三角形内",i,j,d)
                 if depthMap[i][j]>d:
                     depthMap[i][j]=d
                     idMap[i][j]=self.id

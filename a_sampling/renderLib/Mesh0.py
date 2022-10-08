@@ -23,13 +23,10 @@ class Mesh0():
             return np.where (srgb > 0.04045, gamma, scale)
         # id=1+10*256+3*256*256
         self.color=np.array([
-            (id&0xff0000)>>16,
-            (id&0x00ff00)>>8,
-            (id&0x0000ff)
+            (id&0xff0000)>>16,#b
+            (id&0x00ff00)>>8,#g
+            (id&0x0000ff)#r
             ])/255
-        # self.color = srgb_to_linsrgb(
-        #     self.color
-        # )
         self.face=np.array(F).reshape(-1)
         self.vertex=np.array(V)
         self.vertex=self.vertex.reshape(-1)

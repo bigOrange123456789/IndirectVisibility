@@ -23,8 +23,8 @@ class Main:
         # os.walk会得到dir_path下各个后代文件夹和其中的文件的三元组列表，顺序自内而外排列，如 o下有1文件夹，1下有2文件夹：[('o\1\2', [], ['a.py','b']), ('o\1', ['2'], ['c']), ('o', ['1'], [])]
         for root, dirs, files in os.walk(dir_path, topdown=False):
             #root: 各级文件夹绝对路径
-            #dirs: root下一级文件夹名称列表，如 ['文件夹1','文件夹2']
-            #files: root下文件名列表，如 ['文件1','文件2']
+            #dirs: root下一级文件夹名称列表，such as [file1,file2]
+            #files: root下文件名列表，such as [file1,file2]
             for name in files:# 第一步：删除文件
                 os.remove(os.path.join(root, name))  # 删除文件
             for name in dirs:# 第二步：删除空文件夹

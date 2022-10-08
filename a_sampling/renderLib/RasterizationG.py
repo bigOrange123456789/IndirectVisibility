@@ -79,16 +79,17 @@ class Rasterization:
             pygame.display.set_mode((width,height), DOUBLEBUF | OPENGL)
             pygame.display.set_caption("lzc test2")
             InitGL(width, height)
-        
         if loop:
             self.loop()
-        
     def getPanorama(self,x,y,z):
         result=self.render(x,y,z)
         for i in range(6):
             name=str(i)+".png"
             image=result[i]
             cv2.imwrite(name, image)
+    @staticmethod
+    def getPos2(x,y,z):#threeJS与openGL里的都是右手坐标系 
+        return x,-z,y#右手坐标系变换后还是右手坐标系 #这里影响相机的实时漫游
     def render(self,x,y,z):
         self.camera.positionSet(x,y,z)
         camera=self.camera
@@ -99,12 +100,12 @@ class Rasterization:
             image = np.frombuffer(image_buffer, dtype=np.uint8).reshape(self.width,self.height, 3)
             return image
         rotations=[#z偏航角;y俯仰角
-            [0,0],
-            [math.pi/2,0],
-            [math.pi,0],
+            [0,         0],
+            [math.pi/2, 0],
+            [math.pi,   0],
             [3*math.pi/2,0],
-            [0,math.pi/2],
-            [0,1e-10-math.pi/2]
+            [0,         math.pi/2],
+            [0,         1e-5-math.pi/2]
         ]
         result={}
         for i in range(6):

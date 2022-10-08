@@ -54,7 +54,7 @@ class Main:
         t0=t.time()
         numTriangular=0
         self.meshes=[]
-        for i in range(len(matrices_all)):#range(2000):#(1):# range(5000):# i in  # 500-244704 ,51684-15250776
+        for i in range("maxComponentNum" in self.opt and self.opt["maxComponentNum"] or len(matrices_all)):#range(2000):#(1):# range(5000):# i in  # 500-244704 ,51684-15250776
             m0 = Mesh(self.inpath+'/obj/'+str(i)+'.obj')
             self.meshes.append(m0)
             numTriangular=numTriangular+len(m0.face)*len(matrices_all[i])
@@ -68,12 +68,8 @@ class Main:
         )
         
     def sampling(self,ras,x,y,z,saveFlag):
-
-        # t00=t.time()
         images=ras.render(x,y,z)
-        # print("渲染时间：",t.time()-t00)
 
-        # t00=t.time()
         visibilityList={}
         for i in images:# cv2.imwrite(str(i)+".png", images[i])# print(images[i])
             visibilityList[str(i+1)]=Mesh0.parse(images[i])
@@ -81,15 +77,12 @@ class Main:
         if math.floor(y)==y:y=int(y)
         if math.floor(z)==z:z=int(z)
         path=str(x)+","+str(y)+","+str(z)+".json"
-        # print("解析时间：",t.time()-t00)
 
-        # t00=t.time()
         if saveFlag:
             json.dump(
                 visibilityList,
                 open(self.outpath+"/"+path,"w")
             )
-        # print("存储时间：",t.time()-t00)
 
         return visibilityList
 
@@ -134,12 +127,18 @@ class Main:
         print("开始采样","start:",self.startPosition,";end:",self.endPosition,";")
         t0=t.time()
         if "onlyPanorama" in self.opt  and self.opt["onlyPanorama"]:
+            
             i1=int((1+step_num[0])/2)
             i2=int((1+step_num[1])/2)
             i3=int((1+step_num[2])/2)
             x=min[0]+i1*step_len[0]
             y=min[1]+i2*step_len[1]
             z=min[2]+i3*step_len[2]
+
+            # x=self.opt["posPanorama"][0]
+            # y=self.opt["posPanorama"][1]
+            # z=self.opt["posPanorama"][2]
+
             print("采样位置",x,y,z)
             ras.getPanorama(x,y,z)
         else:
@@ -156,11 +155,11 @@ class Main:
                             z=min[2]+i3*step_len[2]
                             self.sampling(ras,x,y,z,True)
         # ras.getPanorama(2213.0870081831645,  23, -1888.057576657758)
+        # ras.getPanorama(2154,0,-1918)
+        #2154,0,-1918
         # self.sampling(ras,2213.0870081831645,  23, -1888.057576657758,True)
         print("\n 采样时间：",(t.time()-t0)/60,"min")
         self.samplingTime=(t.time()-t0)/60
-
-        
 
 if __name__ == "__main__":#用于测试
     import sys
