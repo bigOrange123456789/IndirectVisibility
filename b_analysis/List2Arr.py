@@ -15,7 +15,8 @@ class List2Arr:
         Tool.saveJson(opt["out7_d_index"]+".json",list_index)
         self.result=[list_arr,list_index]
 
-    def process(self,config,list):
+    @staticmethod
+    def process(config,list):
         list_arr=[]
         list_index={}
         step=config["step"]

@@ -50,6 +50,42 @@ class Loader:#主要作用是给出直接可见度
           print(str(numberIndex)+"/"+str(numberAll),end="\r")
       print()
       return data,nameList
+   @staticmethod
+   def loadingSim(opt):
+      print("采样集:",opt["in"])
+      list_all={}
+      for i in range(6):
+        direct=str(i+1)
+        list_all[direct]={}
+
+      import os
+      numberAll=len(os.listdir(opt["in"]))
+      numberIndex=0
+      for fileName in os.listdir(opt["in"]):
+          if fileName=="config.json" or not len(fileName.split(".json"))==2:
+              continue
+          f1=open(opt["in"]+"/"+fileName, encoding='gb18030', errors='ignore')
+          j=json.load(f1)
+          if opt["multidirectionalSampling"]:#分成多个方向分别存储
+            for direct in j: # direct 1-6
+                key0=list( j[direct].keys() )
+                value0=list( j[direct].values() )
+                if len(key0)==0:
+                    list0= []
+                else:
+                    index2=np.argsort(-np.array(value0))
+                    list0= np.array(key0)[index2].tolist()
+                list_all[ direct ][ fileName.split(".json")[0] ]=list0 
+          numberIndex=numberIndex+1
+          print(str(numberIndex)+"/"+str(numberAll),end="\r")
+      print()
+    #   for direct in list_all:
+    #     #修改存储路径
+    #     list=list_all[direct]
+    #     list_arr,list_index=List2Arr.process(list)
+    #     Tool.saveJson(self.opt["out7_d_arr"]+".json",list_arr)
+    #     Tool.saveJson(self.opt["out7_d_index"]+".json",list_index)
+      return list_all
    def getMax(self,data):#获取构件的最大编号 既构件编号
     max=-1
     for i in data:

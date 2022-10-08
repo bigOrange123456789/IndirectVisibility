@@ -87,6 +87,16 @@ class Main:
     for i in self.opt:
         print("  "+i+":",self.opt[i])
     Check(self.opt)
+
+    if "sim_super" in self.opt and self.opt["sim_super"]:#对处理过程超级简化
+      list_all=Loader.loadingSim(self.opt)
+      for direct in list_all:
+        self.optSet(self.outPath+"/out"+direct)#修改存储路径
+        list_arr,list_index=List2Arr.process(list_all[direct])
+        Tool.saveJson(self.opt["out7_d_arr"]+".json",list_arr)
+        Tool.saveJson(self.opt["out7_d_index"]+".json",list_index)
+      return
+
     print('1.直接可见度')#第一步必须要执行
     loader=Loader(self.opt)
     nameList0_old,d0_,t1=loader.result
@@ -113,6 +123,7 @@ class Main:
     tl=t.time()
     print("step1.执行时间："+str((t1/60/1000))+" min")
     print("总执行时间："+str(((tl-t0)/60))+" min")
+
     #以下代码用于测试中的断言
     self.ls={}
     for i in range(len(self.nameList)):
