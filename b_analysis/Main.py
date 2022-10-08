@@ -168,6 +168,8 @@ if __name__ == "__main__":#用于测试
     config["in"]=config["result_path"]
   if "analysis" in config and not config["analysis"]:
     exit(0)
+  if "step_num" in config:
+    config["step"]=config["step_num"]
   iv=Main(config)
   iv.remove(iv.outPath)
   iv.start()
