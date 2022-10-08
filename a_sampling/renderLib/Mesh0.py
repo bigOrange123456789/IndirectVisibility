@@ -53,9 +53,7 @@ class Mesh0():
     @staticmethod
     def parse(image):
         result={}
-        
         image=256*256*image[:,:,0]+256*image[:,:,1]+image[:,:,2]
-
         # xm,ym,_=image.shape
         # for i1 in range(xm):
         #     for i2 in range(ym):

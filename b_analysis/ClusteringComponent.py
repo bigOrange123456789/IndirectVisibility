@@ -1,3 +1,4 @@
+from sys import dont_write_bytecode
 import numpy as np
 import os
 from lib.Tool import Tool as T
@@ -5,8 +6,13 @@ from lib.Clustering import Clustering
 class ClusteringComponent:
   def __init__(self,d0_,opt):
     if len(d0_)==0:
-        print("视点个数为0!")
-        exit(0)
+        print("视点个数为0!!!")
+        d0=d0_
+        groups_arr=[]
+        for i in range(10*10000):#假设构件的最大编号为10万
+          groups_arr.append([i])
+        self.result=[d0,groups_arr]
+        return 
     if opt["step_component"]==1:#步长为1则跳过构件聚类
       component_num=len(d0_[0])
       groups_arr=[]
