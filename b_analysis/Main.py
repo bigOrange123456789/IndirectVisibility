@@ -92,7 +92,7 @@ class Main:
       list_all=Loader.loadingSim(self.opt)
       for direct in list_all:
         self.optSet(self.outPath+"/out"+direct)#修改存储路径
-        list_arr,list_index=List2Arr.process(list_all[direct])
+        list_arr,list_index=List2Arr.process(self.opt,list_all[direct])
         Tool.saveJson(self.opt["out7_d_arr"]+".json",list_arr)
         Tool.saveJson(self.opt["out7_d_index"]+".json",list_index)
       return
