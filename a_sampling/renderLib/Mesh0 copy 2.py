@@ -27,15 +27,19 @@ class Mesh0():
             (id&0x00ff00)>>8,#g
             (id&0x0000ff)#r
             ])/255
-        self.face=np.array(F).reshape(-1)
         self.vertex=np.array(V)
+        self.color2=np.ones(self.vertex.shape)
+        for i in range(3):
+            self.color2[:,i]=self.color2[:,i]*self.color[i]
+
+        self.face=np.array(F).reshape(-1)
         self.vertex=self.vertex.reshape(-1)
+        self.color2=self.color2.reshape(-1)
+
         self.createVAO()
     def createVAO(this):
         import OpenGL
         this.vbo = OpenGL.arrays.vbo.VBO(np.array(this.vertex,'f'))
-        # this.vbo = OpenGL.arrays.vbo.VBO(np.array(Pos, dtype=np.float32))
-        # this.cbo = OpenGL.arrays.vbo.VBO(np.array(Colors, dtype=np.float32)) 
         this.ebo = OpenGL.arrays.vbo.VBO(np.array(this.face,'H'),target = OpenGL.GL.GL_ELEMENT_ARRAY_BUFFER)
         this.vboLength = len(this.vertex)
         this.eboLength = len(this.face)
@@ -43,6 +47,7 @@ class Mesh0():
     def draw(this):
         OpenGL.GL.glColor4f(this.color[0], this.color[1], this.color[2], 1.0)  # 设置当前颜色为红色不透明
         this.vbo.bind()
+        # this.cbo.bind()
         OpenGL.GL.glInterleavedArrays(OpenGL.GL.GL_V3F,0,None)
         this.ebo.bind()
         # OpenGL.GL.glFrontFace(OpenGL.GL.GL_CW) # GL_CCW（逆时针）或 GL_CW（顺时针）为正向
@@ -53,21 +58,9 @@ class Mesh0():
     def parse(image):
         result={}
         image=256*256*image[:,:,0]+256*image[:,:,1]+image[:,:,2]
-        # xm,ym,_=image.shape
-        # for i1 in range(xm):
-        #     for i2 in range(ym):
-        #         # pixel=image[i1][i2] 
-        #         # id=256*256*pixel[0]+256*pixel[1]+pixel[2]
-        #         id=image[i1][i2] 
-        #         if not id==0xffffff:
-        #             id=str(id)
-        #             if id in result: result[id]=result[id]+1
-        #             else:            result[id]=1
-        
         for k in np.unique(image):
             if not k==0xffffff:
                 result[str(k)] = image[ image == k ].size
-
         return result
     @staticmethod
     def getMesh0(mesh,matrix,id):

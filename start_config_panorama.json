@@ -40,5 +40,9 @@
     "analysis":false,
     "onlyPanorama":true,
 
-    "posPanorama":[2154,0,-1918]
+    "posPanorama":[
+        2207,
+        0,
+        -1880
+    ]
 }

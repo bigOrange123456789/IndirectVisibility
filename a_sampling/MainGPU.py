@@ -127,17 +127,15 @@ class Main:
         print("开始采样","start:",self.startPosition,";end:",self.endPosition,";")
         t0=t.time()
         if "onlyPanorama" in self.opt  and self.opt["onlyPanorama"]:
-            
-            i1=int((1+step_num[0])/2)
-            i2=int((1+step_num[1])/2)
-            i3=int((1+step_num[2])/2)
-            x=min[0]+i1*step_len[0]
-            y=min[1]+i2*step_len[1]
-            z=min[2]+i3*step_len[2]
-
-            # x=self.opt["posPanorama"][0]
-            # y=self.opt["posPanorama"][1]
-            # z=self.opt["posPanorama"][2]
+            # i1=int((1+step_num[0])/2)
+            # i2=int((1+step_num[1])/2)
+            # i3=int((1+step_num[2])/2)
+            # x=min[0]+i1*step_len[0]
+            # y=min[1]+i2*step_len[1]
+            # z=min[2]+i3*step_len[2]
+            x=self.opt["posPanorama"][0]
+            y=self.opt["posPanorama"][1]
+            z=self.opt["posPanorama"][2]
 
             print("采样位置",x,y,z)
             ras.getPanorama(x,y,z)
