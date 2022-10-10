@@ -1,6 +1,5 @@
 from Mesh import Mesh
 from renderLib.RasterizationG import Rasterization
-from renderLib.Renderer import Renderer
 from renderLib.Mesh0 import Mesh0
 import time as t
 import json
@@ -55,11 +54,7 @@ class Main:
         t0=t.time()
         numTriangular=0
         self.meshes=[]
-        for i in range(
-                ("maxComponentNum" in self.opt) 
-                and min(self.opt["maxComponentNum"],len(matrices_all)) 
-                or len(matrices_all)
-            ):#range(2000):#(1):# range(5000):# i in  # 500-244704 ,51684-15250776
+        for i in range("maxComponentNum" in self.opt and self.opt["maxComponentNum"] or len(matrices_all)):#range(2000):#(1):# range(5000):# i in  # 500-244704 ,51684-15250776
             m0 = Mesh(self.inpath+'/obj/'+str(i)+'.obj')
             self.meshes.append(m0)
             numTriangular=numTriangular+len(m0.face)*len(matrices_all[i])
@@ -94,12 +89,8 @@ class Main:
     def render(self,max,min,step_num):
         print("矩阵计算 start")
         t0=t.time()
-        mesh_type="HugeMesh" # "InstancedMesh" #"mesh0"   #
-        if mesh_type=="HugeMesh":
-            self.render_huge(max,min,step_num)
-            return
-        
         renderNodes=[]
+        mesh_type="InstancedMesh" #"mesh0"   #
         for i in range(len(self.meshes)):#range(len(matrices_all)):
             print("矩阵计算",len(self.meshes),i,end="\t\r")
             m0 = self.meshes[i]
@@ -161,54 +152,6 @@ class Main:
                             y=min[1]+i2*step_len[1]
                             z=min[2]+i3*step_len[2]
                             self.sampling(ras,x,y,z,True)
-        # ras.getPanorama(2213.0870081831645,  23, -1888.057576657758)
-        # ras.getPanorama(2154,0,-1918)
-        #2154,0,-1918
-        # self.sampling(ras,2213.0870081831645,  23, -1888.057576657758,True)
-        print("\n 采样时间：",(t.time()-t0)/60,"min")
-        self.samplingTime=(t.time()-t0)/60
-    def render_huge(self,max,min,step_num):
-        print("矩阵计算 start")
-        t0=t.time()
-        # renderNodes=[]
-        V,F=Mesh0.getHugeMesh(self.meshes,self.matrices_all)
-
-        print("矩阵计算时间：",(t.time()-t0)/60,"min")
-
-        print("初始化渲染器")
-        t0=t.time()
-        renderer=Renderer(
-            self.opt["w"],self.opt["h"],
-            V,F
-            )
-        print("初始化渲染器的时间:",(t.time()-t0)/60,"min")
-        step_len=[
-            (max[0]-min[0])/step_num[0],
-            (max[1]-min[1])/step_num[1],
-            (max[2]-min[2])/step_num[2],
-        ]
-        print("step_len",step_len)
-        
-        print("开始采样","start:",self.startPosition,";end:",self.endPosition,";")
-        t0=t.time()
-        if "onlyPanorama" in self.opt  and self.opt["onlyPanorama"]:
-            # i1=int((1+step_num[0])/2)
-            # i2=int((1+step_num[1])/2)
-            # i3=int((1+step_num[2])/2)
-            # x=min[0]+i1*step_len[0]
-            # y=min[1]+i2*step_len[1]
-            # z=min[2]+i3*step_len[2]
-            x=self.opt["posPanorama"][0]
-            y=self.opt["posPanorama"][1]
-            z=self.opt["posPanorama"][2]
-
-            print("采样位置",x,y,z)
-            # ras.getPanorama(x,y,z)
-            for i in range(6):
-                p,v=renderer.getVP2(i,[x,y,z])
-                renderer.render(p, v)
-                img=renderer.getImag()
-                self.saveImg(img,str(i)+".png")
         # ras.getPanorama(2213.0870081831645,  23, -1888.057576657758)
         # ras.getPanorama(2154,0,-1918)
         #2154,0,-1918

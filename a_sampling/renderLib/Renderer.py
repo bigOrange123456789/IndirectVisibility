@@ -3,10 +3,9 @@ from OpenGL.GL.shaders import *
 from OpenGL.GLU import *
 from OpenGL.GLUT import *
 
-import numpy, math, sys ,os
+import numpy, math, sys 
 class Renderer:
     def __init__(self,w,h,V,F):
-        # os.environ['SDL_VIDEO_WINDOW_POS']="%d,%d"%(-1000,-1000)
         self.width = w
         self.height = h
         self.elemSize=4# uint32 以及 float32 占用空间的大小
@@ -17,13 +16,10 @@ class Renderer:
         glutInitWindowSize(self.width, self.height)
         glutCreateWindow("test")
         glutHideWindow()
-        # glutInitWindowPosition(2,2)
-
-        ###########################################################
 
         # create shader
-        strVS = open(r"./glsl/test12.6.vs.glsl","r",encoding="utf-8").read()
-        strFS = open(r"./glsl/test12.fs.glsl","r",encoding="utf-8").read()
+        strVS = open(r"./a_sampling/renderLib/glsl/vert.glsl","r",encoding="utf-8").read()
+        strFS = open(r"./a_sampling/renderLib/glsl/frag.glsl","r",encoding="utf-8").read()
         self.program = compileProgram(
             compileShader(strVS,GL_VERTEX_SHADER),
             compileShader(strFS,GL_FRAGMENT_SHADER)
@@ -42,6 +38,7 @@ class Renderer:
         # vertices
         self.VBO = glGenBuffers(1)
         glBindBuffer(GL_ARRAY_BUFFER, self.VBO)
+        # print("v",V)
         vertexData = numpy.array(V, numpy.float32)  # 32位即4B
         glBufferData(GL_ARRAY_BUFFER, self.elemSize * len(vertexData), vertexData, GL_STATIC_DRAW)
 
@@ -99,6 +96,60 @@ class Renderer:
                                 0.0, 0.0, 1.0, 0.0, 
                                 0.5, 0.0, -5.0, 1.0], numpy.float32)
         return pMatrix, mvMatrix
+    @staticmethod
+    def getVP2(direction,pos):
+        V_All_Inverse=[
+            [
+                1, 0, 0, 0, 
+                0, 1, 0, 0, 
+                0, 0, 1, 0, 
+                2207, 27, -1880, 1
+            ],
+            [
+                1, 0, 0, 0, 
+                0, 2.220446049250313e-16, 1, 0, 
+                0, -1, 2.220446049250313e-16, 0, 
+                2207, 27, -1880, 1
+            ],
+            [
+                1, 0, 0, 0, 
+                0, -1, 1.2246467991473532e-16, 0, 
+                0, -1.2246467991473532e-16, -1, 0, 
+                2207, 27, -1880, 1
+            ],
+
+            [
+                1, 0, 0, 0, 
+                0, -2.220446049250313e-16, -1, 0, 
+                0, 1, -2.220446049250313e-16, 0, 
+                2207, 27, -1880, 1
+            ],
+            [
+                2.220446049250313e-16, 0, -1, 0, 
+                0, 1, 0, 0, 
+                1, 0, 2.220446049250313e-16, 0, 
+                2207, 27, -1880, 1
+            ],
+            [
+                2.220446049250313e-16, 0, 1, 0, 
+                0, 1, 0, 0, 
+                -1, 0, 2.220446049250313e-16, 0, 
+                2207, 27, -1880, 1
+            ]
+        ]
+        v_inverse=V_All_Inverse[direction]
+        for i in range(3):
+            v_inverse[12+i]=pos[i]
+        v_inverse=numpy.array(v_inverse, numpy.float32).reshape(4,4)
+        v=numpy.linalg.inv(v_inverse).reshape(-1)
+        p=numpy.array([
+            1.0000000000000002, 0, 0, 0, 
+            0, 1.0000000000000002, 0, 0, 
+            0, 0, -1.000006666688889, -1, 
+            0, 0, -0.20000066666888888, 0
+        ], numpy.float32)
+        return p,v
+
 
     def getImag(self):
         image_buffer = glReadPixels(0, 0, self.width,self.height, OpenGL.GL.GL_RGB, OpenGL.GL.GL_UNSIGNED_BYTE)
@@ -111,7 +162,7 @@ if __name__ == "__main__":#用于测试
             -0.2,    0.2,   0,   1.0, 0.0, 0.0,
             -0.2,  -0.2,   0,  1.0, 0.0, 0.0,
             0.2,    0.2,   0,  1.0, 0.0, 0.0,
-            0,  -0.2,   0,    1.0, 0.0, 0.0,#s,    s,   0, 
+            0,  -0.2,   0,    1.0, 0.0, 0.0, #s,    s,   0, 
             -1,  -1,   0,      1.0, 0.0, 0.0, 
             1,   1,   0,       0.0, 1.0, 0.0, 
         ],

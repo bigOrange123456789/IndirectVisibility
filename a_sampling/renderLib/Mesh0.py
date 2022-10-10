@@ -15,7 +15,7 @@ def getVF(mesh,matrix):
         )
     face0=np.array(mesh.face)-1
     return vertex0,face0
-class Mesh0():
+class Mesh0():#实例化网格
     def __init__(self,id,V,F):
         def srgb_to_linsrgb (srgb):
             gamma = ((srgb + 0.055) / 1.055)**2.4
@@ -92,12 +92,12 @@ class Mesh0():
 
         return Mesh0(id,vertex_all,face_all)
     @staticmethod
-    def getBigMesh(mesh,matrices,id):
+    def getInstancedMesh2(mesh,matrices,id):
         vertex_all=np.array([])
         face_all=np.array([])
         for matrix in matrices:
             vertex0,face0=getVF(mesh,matrix)
-            
+
             start_pos=vertex_all.shape[0]
             face0=face0+start_pos
             
@@ -107,5 +107,36 @@ class Mesh0():
             else:
                 vertex_all=np.vstack([vertex_all,vertex0])
                 face_all=np.vstack([face_all,face0])
+        color=np.array([
+            (id&0xff0000)>>16,#b
+            (id&0x00ff00)>>8,#g
+            (id&0x0000ff)#r
+            ])/255
+        for i in range(3):
+            vertex_all=np.c_[vertex_all,color[i]*np.ones(vertex_all.shape[0])]
+        return vertex_all,face_all
+    @staticmethod
+    def getHugeMesh(meshes,matrices_all):
+        vertex_all=np.array([])
+        face_all=np.array([])
 
-        return Mesh0(id,vertex_all,face_all)
+        for i in range(len(meshes)):#range(len(matrices_all)):
+            print("矩阵计算",len(meshes),i,end="\t\r")
+            m0 = meshes[i]
+            matrices=matrices_all[i]
+            vertex0,face0=Mesh0.getInstancedMesh2(m0,matrices,i)
+            # face0=instanceMesh0.face
+            # vertex0=instanceMesh0.vertex
+
+            start_pos=vertex_all.shape[0]
+            face0=face0+start_pos
+            if start_pos==0:
+                vertex_all=vertex0
+                face_all=face0
+            else:
+                # print("vertex_all.shape",vertex_all.shape)
+                # print("vertex0.shape",vertex0.shape)
+                vertex_all=np.vstack([vertex_all,vertex0])
+                face_all=np.vstack([face_all,face0])
+
+        return vertex_all,face_all
