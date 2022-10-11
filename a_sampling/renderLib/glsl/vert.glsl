@@ -11,7 +11,7 @@ void main() {
   // option #1 - fails
   gl_Position = uPMatrix * uMVMatrix * vec4(aVert, 1.0); 
   // option #2 - works
-  gl_Position = vec4(aVert, 1.0); 
+  // gl_Position = vec4(aVert, 1.0); 
   // set color
   vCol = vec4(cVert, 1.0);//vec4(uColor.rgb, 1.0);
 }

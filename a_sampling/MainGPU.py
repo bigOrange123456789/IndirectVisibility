@@ -56,7 +56,7 @@ class Main:
         numTriangular=0
         self.meshes=[]
         for i in range(
-                ("maxComponentNum" in self.opt) 
+                ("maxComponentNum" in self.opt and self.opt["maxComponentNum"]>0) #json文件中有参数maxComponentNum，并且其值大于0
                 and min(self.opt["maxComponentNum"],len(matrices_all)) 
                 or len(matrices_all)
             ):#range(2000):#(1):# range(5000):# i in  # 500-244704 ,51684-15250776
@@ -92,40 +92,54 @@ class Main:
         return visibilityList
 
     def render(self,max,min,step_num):
+        modelParseMode= (
+            "modelParseMode"in self.opt 
+            and self.opt["modelParseMode"] in ["HugeMesh","InstancedMesh","Mesh0"]
+            ) and self.opt["modelParseMode"] or "HugeMesh"
+        print("模型的解析方式为:",modelParseMode)
+        # if modelParseMode=="HugeMesh":
+        #     self.render_huge(max,min,step_num)
+        #     return
+
         print("矩阵计算 start")
         t0=t.time()
-        mesh_type="HugeMesh" # "InstancedMesh" #"mesh0"   #
-        if mesh_type=="HugeMesh":
-            self.render_huge(max,min,step_num)
-            return
-        
-        renderNodes=[]
-        for i in range(len(self.meshes)):#range(len(matrices_all)):
-            print("矩阵计算",len(self.meshes),i,end="\t\r")
-            m0 = self.meshes[i]
-            if mesh_type=="InstancedMesh":
-                matrices=self.matrices_all[i]
-                renderNodes.append(
-                    Mesh0.getInstancedMesh(m0,matrices,i)
-                )
-            else:#"mesh0"
-                for matrix in self.matrices_all[i]:
+        if modelParseMode=="HugeMesh":
+            V,F=Mesh0.getHugeMesh(self.meshes,self.matrices_all)
+        else:
+            renderNodes=[]
+            for i in range(len(self.meshes)):#range(len(matrices_all)):
+            
+                print("矩阵计算",len(self.meshes),i,end="\t\r")
+                m0 = self.meshes[i]
+                if modelParseMode=="InstancedMesh":
+                    matrices=self.matrices_all[i]
                     renderNodes.append(
-                        Mesh0.getMesh0(m0,matrix,i)
+                        Mesh0.getInstancedMesh(m0,matrices,i)
                     )
-
-        print("渲染对象数量:",len(renderNodes))
+                else:#"mesh0"
+                    for matrix in self.matrices_all[i]:
+                        renderNodes.append(
+                            Mesh0.getMesh0(m0,matrix,i)
+                        )
+            print("渲染对象数量:",len(renderNodes))
         print("矩阵计算时间：",(t.time()-t0)/60,"min")
-
+        
         print("初始化渲染器")
         t0=t.time()
-        ras=Rasterization({
-            "renderNodes":renderNodes,
-            "width":self.opt["w"],
-            "height":self.opt["h"],
-            "loop":  False # True #
-        })
+        if modelParseMode=="HugeMesh":
+            ras=Renderer(
+                self.opt["w"],self.opt["h"],
+                V,F
+            )
+        else:
+            ras=Rasterization({
+                "renderNodes":renderNodes,
+                "width":self.opt["w"],
+                "height":self.opt["h"],
+                "loop":  False # True #
+            })
         print("初始化渲染器的时间:",(t.time()-t0)/60,"min")
+        
         step_len=[
             (max[0]-min[0])/step_num[0],
             (max[1]-min[1])/step_num[1],
@@ -163,18 +177,16 @@ class Main:
                             self.sampling(ras,x,y,z,True)
         # ras.getPanorama(2213.0870081831645,  23, -1888.057576657758)
         # ras.getPanorama(2154,0,-1918)
-        #2154,0,-1918
+        # 2154,0,-1918
         # self.sampling(ras,2213.0870081831645,  23, -1888.057576657758,True)
         print("\n 采样时间：",(t.time()-t0)/60,"min")
         self.samplingTime=(t.time()-t0)/60
     def render_huge(self,max,min,step_num):
         print("矩阵计算 start")
         t0=t.time()
-        # renderNodes=[]
         V,F=Mesh0.getHugeMesh(self.meshes,self.matrices_all)
-
+        
         print("矩阵计算时间：",(t.time()-t0)/60,"min")
-
         print("初始化渲染器")
         t0=t.time()
         renderer=Renderer(
@@ -201,18 +213,21 @@ class Main:
             x=self.opt["posPanorama"][0]
             y=self.opt["posPanorama"][1]
             z=self.opt["posPanorama"][2]
-
             print("采样位置",x,y,z)
-            # ras.getPanorama(x,y,z)
-            for i in range(6):
-                p,v=renderer.getVP2(i,[x,y,z])
-                renderer.render(p, v)
-                img=renderer.getImag()
-                self.saveImg(img,str(i)+".png")
-        # ras.getPanorama(2213.0870081831645,  23, -1888.057576657758)
-        # ras.getPanorama(2154,0,-1918)
-        #2154,0,-1918
-        # self.sampling(ras,2213.0870081831645,  23, -1888.057576657758,True)
+            renderer.getPanorama(x,y,z)
+        else:
+            number_all=(1+step_num[0])*(1+step_num[1])*(1+step_num[2])
+            for i1 in range(1+step_num[0]):
+                for i2 in range(1+step_num[1]):
+                    for i3 in range(1+step_num[2]):
+                        number=i1*(1+step_num[1])*(1+step_num[2])+i2*(1+step_num[2])+i3
+                        percent=number/number_all
+                        print("视点总数:",number_all,";当前视点编号:",number,";处理进度:",percent,"\t\t\t",end="\r")
+                        if percent>=self.startPosition and percent<=self.endPosition:      
+                            x=min[0]+i1*step_len[0]
+                            y=min[1]+i2*step_len[1]
+                            z=min[2]+i3*step_len[2]
+                            self.sampling(renderer,x,y,z,True)
         print("\n 采样时间：",(t.time()-t0)/60,"min")
         self.samplingTime=(t.time()-t0)/60
 

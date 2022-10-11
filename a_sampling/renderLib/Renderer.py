@@ -4,8 +4,18 @@ from OpenGL.GLU import *
 from OpenGL.GLUT import *
 
 import numpy, math, sys 
+if __name__ == "__main__":#用于测试
+    strVS = open(r"./glsl/vert.glsl","r",encoding="utf-8").read()
+    strFS = open(r"./glsl/frag.glsl","r",encoding="utf-8").read()
+else:
+    strVS = open(r"./a_sampling/renderLib/glsl/vert.glsl","r",encoding="utf-8").read()
+    strFS = open(r"./a_sampling/renderLib/glsl/frag.glsl","r",encoding="utf-8").read()
 class Renderer:
     def __init__(self,w,h,V,F):
+        V=numpy.array(V).reshape(-1)
+        F=numpy.array(F).reshape(-1)
+        # print("v",V)
+        # print("F",F)
         self.width = w
         self.height = h
         self.elemSize=4# uint32 以及 float32 占用空间的大小
@@ -18,8 +28,6 @@ class Renderer:
         glutHideWindow()
 
         # create shader
-        strVS = open(r"./a_sampling/renderLib/glsl/vert.glsl","r",encoding="utf-8").read()
-        strFS = open(r"./a_sampling/renderLib/glsl/frag.glsl","r",encoding="utf-8").read()
         self.program = compileProgram(
             compileShader(strVS,GL_VERTEX_SHADER),
             compileShader(strFS,GL_FRAGMENT_SHADER)
@@ -49,7 +57,7 @@ class Renderer:
         self.EBO_Len=len(indexData)#索引个数
 
     # render 
-    def render(self, pMatrix, mvMatrix):  
+    def draw(self, pMatrix, mvMatrix):  
         glClearColor(1,1,1,1)#(0.1,0.1,0.5,0.1)#背景颜色
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)#清空颜色缓存区和深度缓存区
 
@@ -60,6 +68,7 @@ class Renderer:
         glUniformMatrix4fv(self.pMatrixUniform, 1, GL_FALSE, pMatrix)
 
         # set modelview matrix
+        # print("mvMatrix",mvMatrix)
         glUniformMatrix4fv(self.mvMatrixUniform, 1, GL_FALSE, mvMatrix)
 
         #enable arrays
@@ -78,7 +87,24 @@ class Renderer:
 
         # disable arrays
         glDisableVertexAttribArray(self.vertIndex)  
-    
+    def getImag(self):
+        image_buffer = glReadPixels(0, 0, self.width,self.height, OpenGL.GL.GL_RGB, OpenGL.GL.GL_UNSIGNED_BYTE)
+        image = numpy.frombuffer(image_buffer, dtype=numpy.uint8).reshape(self.width,self.height, 3)
+        return image
+    def render(self,x,y,z):
+        result={}
+        for i in range(6):
+            p,v=self.getVP2(i,[x,y,z])
+            self.draw(p, v)
+            result[i]=self.getImag()
+        return result
+    def getPanorama(self,x,y,z):
+        import cv2
+        result=self.render(x,y,z)
+        for i in range(6):
+            name=str(i)+".png"
+            image=result[i]
+            cv2.imwrite(name, image)
     def getVP(self):
         # build projection matrix
         fov = math.radians(45.0)
@@ -98,6 +124,19 @@ class Renderer:
         return pMatrix, mvMatrix
     @staticmethod
     def getVP2(direction,pos):
+        # p= numpy.array( [ 
+        #     2.4142137  ,0.         ,0.         ,0.        ,
+        #      0.         ,2.4142137,0.         ,0.         ,
+        #      0.         ,0.        ,-1.002002 , -1.,
+        #     0.         ,0.        ,-0.2002002  ,0.       
+        #     ], numpy.float32)
+        # v=numpy.array( [ #mvMatrix
+        #     1.   ,0.   ,0.   ,0.   ,
+        #     0.   ,1.   ,0.   ,0.   ,
+        #     0.   ,0.   ,1.   ,0.   ,
+        #     0.5  ,0.   ,-5.   ,1. 
+        #     ], numpy.float32)
+        # return p,v
         V_All_Inverse=[
             [
                 1, 0, 0, 0, 
@@ -148,13 +187,17 @@ class Renderer:
             0, 0, -1.000006666688889, -1, 
             0, 0, -0.20000066666888888, 0
         ], numpy.float32)
+        # print()
+        # print("v1\n",v.reshape(4,4))
+        # print("p1\n",p.reshape(4,4))
+        # v=v.reshape(4,4).T.reshape(-1)
+        # p=p.reshape(4,4).T.reshape(-1)
+        # print("v2\n",v.reshape(4,4))
+        # print("p2\n",p.reshape(4,4))
+        # print()
         return p,v
 
-
-    def getImag(self):
-        image_buffer = glReadPixels(0, 0, self.width,self.height, OpenGL.GL.GL_RGB, OpenGL.GL.GL_UNSIGNED_BYTE)
-        image = numpy.frombuffer(image_buffer, dtype=numpy.uint8).reshape(self.width,self.height, 3)
-        return image
+    
 if __name__ == "__main__":#用于测试
     prog = Renderer(
         400,400,
@@ -172,6 +215,8 @@ if __name__ == "__main__":#用于测试
         ]
     )
     pMatrix, mvMatrix=prog.getVP()
-    prog.render(pMatrix, mvMatrix)
-    print(prog.getImag())
+    prog.draw(pMatrix, mvMatrix)
+    # print(prog.getImag())
+    # print("pMatrix\n",pMatrix)
+    # print("mvMatrix\n",mvMatrix)
 

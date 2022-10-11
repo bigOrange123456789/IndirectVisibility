@@ -44,5 +44,7 @@
         2207,
         0,
         -1880
-    ]
+    ],
+    "maxComponentNum":1000,
+    "modelParseMode":"HugeMesh"
 }
