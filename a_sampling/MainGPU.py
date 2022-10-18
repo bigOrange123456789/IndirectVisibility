@@ -16,10 +16,6 @@ class Main:
     def loadJson(path):
         return json.load(open(path))
     @staticmethod
-    def saveImg(image,name):
-        import cv2
-        cv2.imwrite(name,image)
-    @staticmethod
     def remove(dir_path):
         import os
         # os.walk会得到dir_path下各个后代文件夹和其中的文件的三元组列表，顺序自内而外排列，如 o下有1文件夹，1下有2文件夹：[('o\1\2', [], ['a.py','b']), ('o\1', ['2'], ['c']), ('o', ['1'], [])]
@@ -131,8 +127,10 @@ class Main:
         t0=t.time()
         if modelParseMode=="HugeMesh":
             ras=Renderer(
-                self.opt["w"],self.opt["h"],
-                renderNodes["V"],renderNodes["F"]
+                self.opt["w"],
+                self.opt["h"],
+                renderNodes["V"],
+                renderNodes["F"]
             )
         else:
             ras=Rasterization({

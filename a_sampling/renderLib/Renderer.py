@@ -104,6 +104,7 @@ class Renderer:
         for i in range(6):
             name=str(i)+".png"
             image=result[i]
+            image=image[:,:,[2,1,0]]
             cv2.imwrite(name, image)
     def getVP(self):
         # build projection matrix
