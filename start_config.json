@@ -35,7 +35,7 @@
     "out2.nameList":"",
 
     "outPath":"out",
-    "startPosition":0,
+    "startPosition":0.5,
     "endPosition":1,
     "analysis":false
 }

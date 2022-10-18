@@ -16,9 +16,9 @@
 		-1842
 	],
 	"step_num": [
-		53,
-		27,
-		38
+		1,
+		1,
+		1
 	],
 
 	"in":"1.move_all",
@@ -34,17 +34,9 @@
     "out2.d0":"",
     "out2.nameList":"",
 
-    "outPath":"out2",
+    "outPath":"out",
     "startPosition":0,
     "endPosition":1,
     "analysis":false,
-    "onlyPanorama":true,
-
-    "posPanorama":[
-        2207,
-        0,
-        -1880
-    ],
-    "maxComponentNum":-1,
-    "modelParseMode":"HugeMesh"
+    "maxComponentNum":1
 }
