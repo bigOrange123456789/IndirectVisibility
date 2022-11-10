@@ -82,6 +82,7 @@ class Renderer:
         glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, int(self.elemSize * 6), ctypes.c_void_p(self.elemSize * 3))
         glEnableVertexArrayAttrib(self.VAO, 1)
 
+        glCullFace(GL_FRONT)    # 背面透明 GL_FRONT GL_FRONT_AND_BACK
         # draw
         glDrawElements(GL_TRIANGLES,self.EBO_Len , GL_UNSIGNED_INT, None)
 
@@ -183,10 +184,10 @@ class Renderer:
         v_inverse=numpy.array(v_inverse, numpy.float32).reshape(4,4)
         v=numpy.linalg.inv(v_inverse).reshape(-1)
         p=numpy.array([
-            1.0000000000000002, 0, 0, 0, 
-            0, 1.0000000000000002, 0, 0, 
-            0, 0, -1.000006666688889, -1, 
-            0, 0, -0.20000066666888888, 0
+            1, 0, 0, 0, 
+            0, 1, 0, 0, 
+            0, 0, -1, -1, 
+            0, 0, -0.2, 0
         ], numpy.float32)
         # print()
         # print("v1\n",v.reshape(4,4))

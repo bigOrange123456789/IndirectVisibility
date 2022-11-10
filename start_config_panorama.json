@@ -41,10 +41,10 @@
     "onlyPanorama":true,
 
     "posPanorama":[
-        2207,
+        2105,
         0,
-        -1880
+        -1842
     ],
-    "maxComponentNum":-1,
+    "maxComponentNum":20,
     "modelParseMode":"HugeMesh"
 }

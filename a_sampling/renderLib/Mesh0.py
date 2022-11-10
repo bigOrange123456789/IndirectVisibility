@@ -97,6 +97,14 @@ class Mesh0():#实例化网格
         face_all=np.array([])
         for matrix in matrices:
             vertex0,face0=getVF(mesh,matrix)
+            
+            print()
+            print(id)
+            print("顶点个数",vertex0.shape)
+            print("min",np.min(vertex0,0))
+            print("max",np.max(vertex0,0))
+            print()
+
             # print("vertex0",vertex0)
             # print("face0",face0)
             start_pos=vertex_all.shape[0]
@@ -113,6 +121,8 @@ class Mesh0():#实例化网格
             (id&0x00ff00)>>8,#g
             (id&0x0000ff)#r
             ])/255
+        if len(matrices)>1:
+            exit(0)
         # color=[0,1,0]#用于测试
         for i in range(3):
             vertex_all=np.c_[vertex_all,color[i]*np.ones(vertex_all.shape[0])]
