@@ -129,3 +129,9 @@ class Simplify:
             c=999999
         return c
         #self.normal
+if __name__ == "__main__":#用于测试
+    from Mesh import Mesh
+    m1=Mesh("monkey.obj")
+    m1.download("mokey2.obj")
+    Simplify(m1,0.1)
+    m1.download("mokey3.obj")
