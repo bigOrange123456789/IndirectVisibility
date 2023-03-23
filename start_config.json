@@ -37,5 +37,6 @@
     "outPath":"out",
     "startPosition":0.5,
     "endPosition":1,
-    "analysis":false
+    "analysis":false,
+    "maxComponentNum":100
 }
