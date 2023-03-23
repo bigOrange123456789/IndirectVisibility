@@ -1,0 +1,17 @@
+{
+    "in":"E:/myProject/HuaYi3_113/4.SamplingOfVisibility/sampling_huayi_113",
+    "CentralVisibility":true,
+    "groups_outEachStep":true,
+    "step":1,
+    "step_component":1,
+    "useGPU":false,
+    "sim":true,
+    "multidirectionalSampling":true,
+    "out1":"",
+    "out2":"",
+    "out2.d0":"",
+    "out2.nameList":"",
+
+    "in_clusterAssment":"../IndirectVisibility_data/new_huayi113/clusterAssment.json",
+    "out_data2":"../IndirectVisibility_data/new_huayi113/merge"
+}

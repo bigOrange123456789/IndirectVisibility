@@ -1,5 +1,5 @@
 {
-    "inpath":"E:/gitHubRepositories/SoftRasterization/huayi133",
+    "inpath":"../SoftRasterization/huayi133",
     "result_path":"result_directVisibility",
 	"result_path_remove":false,
     "w":800,
