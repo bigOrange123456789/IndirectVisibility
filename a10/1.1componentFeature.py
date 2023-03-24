@@ -123,15 +123,15 @@ class Traverse:
     
     def w(self,id,data):#path='data.npy'
         path=self.path_pre+"/../npy_component_feature/"
-        # np.save(
-        #     path+str(id)+".npy",
-        #     np.array(data)
-        # )# 将数据保存为.npy文件
-        print("特征的保存位置是：",str(id)+".npy")
         np.save(
-            str(id)+".npy",
+            path+str(id)+".npy",
             np.array(data)
         )# 将数据保存为.npy文件
+        # print("特征的保存位置是：",str(id)+".npy")
+        # np.save(
+        #     str(id)+".npy",
+        #     np.array(data)
+        # )# 将数据保存为.npy文件
     def r(self,id):# 读取.npy文件
         path=self.path_pre+"/../npy_component_feature/"
         return np.load(path+str(id)+'.npy').tolist()
