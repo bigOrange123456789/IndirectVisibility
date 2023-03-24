@@ -1,4 +1,5 @@
 print("获取所有构件的可见特征")
+from scipy.sparse import csr_matrix #处理稀释数据
 import numpy as np
 import json
 import os
@@ -31,6 +32,7 @@ class Traverse:
         self.path_pre=path_pre
         self.config=getJson(self.path_pre+"/config.json")
         # self.run()
+    
     def getName(self,i1,i2,i3):
         config=self.config
         min=config["min"]
@@ -112,14 +114,33 @@ class Traverse:
                 self.featureTemp.append(d[str(component0_index)])
             else :
                 self.featureTemp.append(0)
-            # print("component0_index",component0_index)
-            # print("path",path)
-            # print("direction",direction)
-            # print("component0_index in d",component0_index in d)
-            # print("str(component0_index) in d",str(component0_index) in d)
-            # # print("d[component0_index]",d[component0_index])
-            # print("self.featureTemp",self.featureTemp)
-            # exit(0)
+
+    def run3(self,index_list):#获取某个构件的可见特征
+        self.featureTemp=index_list
+        config=self.config#def check(config):
+        step=config["step"]
+        for i1 in range(step[0]+1):
+            for i2 in range(step[1]+1):
+                for i3 in range(step[2]+1):
+                    path=self.path_pre+"/"+self.getName(i1,i2,i3)+".json"
+                    self.fun3(path)
+        for component0_index in self.featureTemp:
+            self.w(
+                self.toSparse(component0_index),
+                self.featureTemp[component0_index]
+            )
+        return self.featureTemp
+    def fun3(self,path):#获取某个构件的可见特征
+        data=getJson(path)
+        for component0_index in self.featureTemp:
+          for direction in data:
+            d=data[direction]
+            if str(component0_index) in d:
+                self.featureTemp[component0_index].append(d[str(component0_index)])
+            else :
+                self.featureTemp[component0_index].append(0)
+        #   vector=self.featureTemp[component0_index]
+        #   self.featureTemp[component0_index]=self.toSparse(vector)
     
     def w(self,id,data):#path='data.npy'
         path=self.path_pre+"/../npy_component_feature/"
@@ -132,9 +153,32 @@ class Traverse:
         #     str(id)+".npy",
         #     np.array(data)
         # )# 将数据保存为.npy文件
+    def toSparse(self,data):
+        print("data",data)
+        data2={}
+        for i in range(len(data)):
+            if not data[i]==0:
+                data2[i]=data[i]
+        sparse_vector=data2
+        print("data2",data2)
+        return  csr_matrix(([sparse_vector[i] for i in sparse_vector.keys()], ([0] * len(sparse_vector), list(sparse_vector.keys()))))
+
+
     def r(self,id):# 读取.npy文件
         path=self.path_pre+"/../npy_component_feature/"
         return np.load(path+str(id)+'.npy').tolist()
+    def r2(self,id):# 读取.npy文件
+        # 读取npy文件，得到稀疏矩阵
+        path=self.path_pre+"/../npy_component_feature/"+str(id)+'.npy'
+        sparse_matrix = np.load(path)
+
+        # 将稀疏矩阵转换成Python的字典格式
+        sparse_vector = {}
+        row, col = sparse_matrix.nonzero()
+        for i in range(len(row)):
+            sparse_vector[col[i]] = sparse_matrix[row[i], col[i]]
+
+        return sparse_vector
 
 import sys
 if __name__ == "__main__":#用于测试
@@ -147,12 +191,25 @@ if __name__ == "__main__":#用于测试
     traverse=Traverse(path_pre)
 
     print("获取最大的构件编号")
-    maxindex=799  # traverse.run1()
+    maxindex=120678+100  # traverse.run1()
 
     print("获取所有构件的特征")
-    for index0 in range(maxindex+1):
+    # for index0 in range(maxindex+1):
+    #     print(index0,"\t",maxindex+1,end="\r")
+    #     traverse.run2(index0)
+    batch_size=5000
+    print("每批次的构件个数为:",batch_size)
+    index0=0
+    while index0<maxindex:
         print(index0,"\t",maxindex+1,end="\r")
-        traverse.run2(index0)
+        index_list={}
+        for i in range(batch_size):
+            if index0<maxindex:
+                index_list[i]=[]#.append(i)
+            index0+=1
+        traverse.run3(index_list)
+        
+    
 
     # data=np.load('23.npy').tolist()
     # print("开始检索")
