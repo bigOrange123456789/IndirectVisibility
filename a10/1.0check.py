@@ -16,7 +16,7 @@ config=loadJson(path)
 #   iv=Main(config)
 #   iv.remove(iv.outPath)
 #   iv.start()
-path_pre=config["in"]
+path_pre=config["in_temp"]
 
 # path_pre="1.move_all"
 # path_pre="../4.SamplingOfVisibility/sampling_huayi_113"

@@ -21,14 +21,14 @@ class ClusteringComponent:
       self.result=[d0_,groups_arr]
       return
     self.opt=opt
-    if os.path.exists(self.opt["out.ClusteringComponent.groups_arr"]+".json") :
+    if os.path.exists(self.opt["out.ClusteringComponent.groups_arr"]+".json") :#如果有之前的聚类结果?
       groups_arr=T.loadJson(self.opt["out.ClusteringComponent.groups_arr"]+".json")
       if self.opt["multidirectionalSampling"]:
         d0=[]
       else:
         d0=T.loadJson(self.opt["out.ClusteringComponent.d0"]+".json")
     else:
-      d0,groups_arr=self.clustering(
+      d0,groups_arr=self.clustering(#进行聚类
           d0_,
           self.opt["step_component"]
       )

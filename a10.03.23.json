@@ -1,4 +1,9 @@
 {
+    "in_temp":"E:/myProject/HuaYi3_113/4.SamplingOfVisibility/sampling_huayi_113",
+
+    "in_clusterAssment":"../IndirectVisibility_data/new_huayi113_2/clusterAssment.json",
+    "out_data2":        "../IndirectVisibility_data/new_huayi113_2/merge",
+    
     "in":"../IndirectVisibility_data/new_huayi113_2/merge",
     "CentralVisibility":true,
     "groups_outEachStep":true,
@@ -11,7 +16,5 @@
     "out2":"",
     "out2.d0":"",
     "out2.nameList":""
+
 }
-
-
-
