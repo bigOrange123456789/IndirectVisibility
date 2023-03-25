@@ -35,9 +35,9 @@ class Traverse:
     
     def getName(self,i1,i2,i3):
         config=self.config
-        min=config["min"]
+        min =config["min"]
         step=config["step"]
-        max=config["max"]
+        max =config["max"]
         x0=min[0]+(max[0]-min[0])*i1/step[0]
         y0=min[1]+(max[1]-min[1])*i2/step[1]
         z0=min[2]+(max[2]-min[2])*i3/step[2]
@@ -45,7 +45,6 @@ class Traverse:
         if math.floor(y0)==y0:y0=int(y0)
         if math.floor(z0)==z0:z0=int(z0)
         return str(x0)+","+str(y0)+","+str(z0)
-    
     def run0(self):
         config=self.config#def check(config):
         step=config["step"]
@@ -139,6 +138,11 @@ class Traverse:
                 self.featureTemp[component0_index].append(d[str(component0_index)])
             else :
                 self.featureTemp[component0_index].append(0)
+            # if str(2478) in d:
+            #     print("")
+            #     print(str(2478) in d)
+            #     print("d['2478']",d['2478'])
+
     
     def w(self,id,data):#path='data.npy'
         path=self.path_pre+"/../npy_component_feature/"
@@ -146,19 +150,13 @@ class Traverse:
             path+str(id)+".npy",
             np.array(data)
         )# 将数据保存为.npy文件
-        # print("特征的保存位置是：",str(id)+".npy")
-        # np.save(
-        #     str(id)+".npy",
-        #     np.array(data)
-        # )# 将数据保存为.npy文件
     def w2(self,id,data):#path='data.npy'
         path=self.path_pre+"/../npy_component_feature/"
-        # print(data)
         if np.sum(np.array(data))==0:
-            np.save(
-                path+str(id)+".npy",
-                np.array(data)
-            )# 将数据保存为.npy文件
+            # np.save(
+            #     path+str(id)+".npy",
+            #     np.array(data)
+            # )# 将数据保存为.npy文件
             print("空文件:",path,id)
         else:   
             np.save(
@@ -180,7 +178,7 @@ class Traverse:
                     list(sparse_vector.keys())
                 )
             ))
-
+    
     def r(self,id):# 读取.npy文件
         path=self.path_pre+"/../npy_component_feature/"
         return np.load(path+str(id)+'.npy').tolist()
@@ -197,6 +195,22 @@ class Traverse:
 
 import sys
 if __name__ == "__main__":#用于测试
+    # data=[0,0,1,2,0,9,0]
+    # data2={}
+    # for i in range(len(data)):
+    #         if not data[i]==0:
+    #             data2[i]=data[i]
+    # sparse_vector=data2
+    # x= csr_matrix(
+    #         (
+    #             [sparse_vector[i] for i in sparse_vector.keys()], 
+    #             (
+    #                 [0] * len(sparse_vector), 
+    #                 list(sparse_vector.keys())
+    #             )
+    #         ))
+    # print("x",x)
+    # exit(0)
     if len(sys.argv)<2:
         print("ERR:请指定config.json的路径")
         exit(0)
@@ -223,7 +237,9 @@ if __name__ == "__main__":#用于测试
             if index0<maxindex:
                 index_list[index0]=[]#.append(i)
             index0+=1
+        # index_list={2478:[]}
         traverse.run3(index_list)
+        # exit(0)
         
     # data=np.load('23.npy').tolist()
     # print("开始检索")
