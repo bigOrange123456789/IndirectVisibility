@@ -1,10 +1,8 @@
 print("基于构件的可见特征对构件进行分块聚类")
-
 ######################################
 import numpy as np
 import random
 import math
-
 list1 = [1, 2, 3, 4, 5]  
 list1 = [
     [0,0],

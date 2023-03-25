@@ -130,7 +130,6 @@ def check(config):
                     data1=loadJson(path)
                     data2=conversion(data1,clusterAssment)
                     saveJson(path_out_data2+"/"+getName(config,i1,i2,i3)+".json",data2)
-
     print("已检测完全部构件     ")
     if len(jsonPathErr)==0:
         print("没有空的json文件")
