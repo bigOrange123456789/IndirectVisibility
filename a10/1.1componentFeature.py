@@ -212,11 +212,12 @@ if __name__ == "__main__":#用于测试
     # for index0 in range(maxindex+1):
     #     print(index0,"\t",maxindex+1,end="\r")
     #     traverse.run2(index0)
-    batch_size=3
+    batch_size=2500
     print("每批次的构件个数为:",batch_size)
+    print()
     index0=0
     while index0<maxindex:
-        print(index0,"\t",maxindex+1,end="\r")
+        print("\t\t\t\t\t",str(index0)+"/"+str(maxindex+1),end="\r")
         index_list={}
         for i in range(batch_size):
             if index0<maxindex:
